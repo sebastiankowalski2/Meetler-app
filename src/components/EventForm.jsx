@@ -40,13 +40,14 @@ export default function EventForm() {
   return (
     <>
       <div className="flex items-center justify-center align-middle">
-        <div className="form-group w-100 items-center border-10 border-blue-400 bg-blue-200 flex flex-col p-2 pt-4 rounded-3xl gap-2">
+        <div className="form-group w-100 items-center border-10 border-blue-400 bg-blue-200 flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl">
           <form onSubmit={handleSubmit}>
             <div className="w-75">
               <label htmlFor="eventName">Event Name: </label>
               <input
-                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-4"
+                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-4 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
                 type="text"
+                placeholder="Birthday Party, Conference, etc."
                 id="eventName"
                 name="eventName"
                 value={formData.eventName}
@@ -56,8 +57,9 @@ export default function EventForm() {
 
               <label htmlFor="eventLocation">Location: </label>
               <input
-                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-2"
+                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-2 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
                 type="text"
+                placeholder="Bill's House, Central Park, etc."
                 id="eventLocation"
                 name="eventLocation"
                 value={formData.eventLocation}
@@ -66,7 +68,7 @@ export default function EventForm() {
               />
             </div>
             <button
-              className="bg-blue-500 text-2xl m-3 text-white cursor-pointer rounded-2xl p-3 hover:bg-blue-600 transition-colors duration-250"
+              className="bg-blue-500 text-2xl m-3 text-white cursor-pointer rounded-2xl p-3 hover:bg-blue-600 transition-all duration-250 hover:shadow-sm hover:shadow-blue-950"
               type="submit"
             >
               Create Event
