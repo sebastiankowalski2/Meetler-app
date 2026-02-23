@@ -1,9 +1,14 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { db } from '../firebase'
+import { collection, addDoc } from 'firebase/firestore'
 
 export default function EventForm() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     eventName: '',
     eventLocation: '',
+    timeRangeDays: '',
   })
 
   const handleChange = (e) => {
@@ -14,27 +19,27 @@ export default function EventForm() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     console.log('Form submitted:', formData)
 
-    // Reset the form
-    setFormData({
-      eventName: '',
-      eventLocation: '',
-    })
+    try {
+      // Add a new document with a generated ID to the "events" collection in Firestore
+      const docRef = await addDoc(collection(db, 'events'), formData)
 
-    // What next:
-    // We can replace the console.log with an API call to create the event in the backend. For example, using fetch or axios to send a POST request with the form data to your server.
-    // We will also navigate to the newly created event page after submission(EventPage.jsx). For that, we can use the useNavigate hook from react-router-dom.
-    // First, import the hook at the top of this file:
-    // import { useNavigate } from 'react-router-dom';
-    // Then, initialize it inside the component:
-    // const navigate = useNavigate();
-    // Finally, after successfully creating the event (e.g., after an API call), you can navigate to the event page:
-    // For example, if you have a backend that returns the new event ID, you could do:
-    // const newEventId = response.data.id; // Assuming your API returns the new event ID
-    // navigate(`/event/${newEventId}`);
+      console.log('Document written with ID: ', docRef.id)
+
+      // Reset the form
+      setFormData({
+        eventName: '',
+        eventLocation: '',
+        timeRangeDays: '',
+      })
+      // Navigate to the newly created event page using the generated document ID
+      navigate(`/event/${docRef.id}`)
+    } catch (e) {
+      console.error('Error adding document: ', e)
+    }
   }
 
   return (
@@ -57,14 +62,26 @@ export default function EventForm() {
 
               <label htmlFor="eventLocation">Location: </label>
               <input
-                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-2 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
+                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-4 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
                 type="text"
                 placeholder="Bill's House, Central Park, etc."
                 id="eventLocation"
                 name="eventLocation"
                 value={formData.eventLocation}
                 onChange={handleChange}
-                required
+              />
+
+              <label htmlFor="timeRangeDays">
+                Time Range (Days - from now on):{' '}
+              </label>
+              <input
+                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-2 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
+                type="text"
+                placeholder="7, 14, etc."
+                id="timeRangeDays"
+                name="timeRangeDays"
+                value={formData.timeRangeDays}
+                onChange={handleChange}
               />
             </div>
             <button
