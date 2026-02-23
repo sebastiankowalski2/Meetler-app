@@ -35,6 +35,7 @@ export default function EventForm() {
         eventLocation: '',
         timeRangeDays: '',
       })
+
       // Navigate to the newly created event page using the generated document ID
       navigate(`/event/${docRef.id}`)
     } catch (e) {
@@ -82,6 +83,7 @@ export default function EventForm() {
                 name="timeRangeDays"
                 value={formData.timeRangeDays}
                 onChange={handleChange}
+                required
               />
             </div>
             <button
