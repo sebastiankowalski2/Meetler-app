@@ -22,10 +22,20 @@ export default function NicknameForm({ setNickname }) {
     setNickname('Guest')
   }
 
+  const handleBackdropClick = () => {
+    setNickname('Guest')
+  }
+
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="form-group w-90 items-center border-10 border-blue-400 bg-blue-200 flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl">
+        {/* Blur overlay background */}
+        <div
+          onClick={handleBackdropClick}
+          className="absolute inset-0  backdrop-blur-xs z-40"
+        ></div>
+
+        <div className="form-group w-90 items-center border-10 border-blue-400 bg-blue-200 flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl relative z-50">
           <form onSubmit={handleSubmit}>
             <div className="">
               <label className="text-2xl font-semibold" htmlFor="nickname">

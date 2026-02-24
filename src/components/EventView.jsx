@@ -16,9 +16,7 @@ export default function EventView({ eventData }) {
         <span className="text-2xl pl-1">🏷️</span>
       </div>
 
-      {
-        // Only show the location if it exists in the event data - if the user didnt fill it out, we dont want to show an empty location field
-      }
+      {/* Only show the location if it exists in the event data - if the user didnt fill it out, we dont want to show an empty location field*/}
       {eventData.eventLocation && (
         <div className="justify-center flex align-middle items-center">
           <span className="text-2xl pb-2 pr-1">📍</span>
