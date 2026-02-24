@@ -2,10 +2,10 @@
 
 @layer base {
   html {
-    @apply h-screen;
+    @apply h-full;
   }
 
   body {
-    @apply h-screen bg-gradient-to-br from-green-500 to-yellow-300 text-slate-900;
+    @apply min-h-screen bg-gradient-to-br from-green-500 to-yellow-300 text-slate-900 bg-no-repeat bg-fixed;
   }
 }

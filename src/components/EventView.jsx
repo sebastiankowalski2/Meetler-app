@@ -29,7 +29,7 @@ export default function EventView({ eventData }) {
       {nickname === '' ? (
         <NicknameForm setNickname={setNickname} />
       ) : (
-        <AvailabilityGrid nickname={nickname} eventData={eventData} />
+        <AvailabilityGrid eventData={eventData} />
       )}
     </div>
   )

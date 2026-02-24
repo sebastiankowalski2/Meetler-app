@@ -1,7 +1,7 @@
 import React from 'react'
 import CalendarButton from './CalendarButton'
 
-export default function AvailabilityGrid({ nickname, eventData }) {
+export default function AvailabilityGrid({ eventData }) {
   const daysCount = eventData.timeRangeDays
 
   const generateDates = (daysCount) => {
@@ -12,13 +12,6 @@ export default function AvailabilityGrid({ nickname, eventData }) {
       const date = new Date(today)
       date.setDate(today.getDate() + i)
 
-      // // Format the date as "DD-MM-YYYY"
-      // const formattedDate =
-      //   date.getDate().toString().padStart(2, '0') +
-      //   '-' +
-      //   (date.getMonth() + 1).toString().padStart(2, '0') +
-      //   '-' +
-      //   date.getFullYear()
       dates.push(date)
     }
     return dates
@@ -26,38 +19,59 @@ export default function AvailabilityGrid({ nickname, eventData }) {
 
   const dates = generateDates(daysCount)
 
-  // Bierzemy pierwszą datę z zakresu
-  // const firstDateParts = dates[0].split('-') // ["23","02","2026"]
+  // Function that group dates by month in object
+  const groupedDatesByMonth = (dates) => {
+    const groups = {}
 
-  // // Zamieniamy na ISO żeby Date działał poprawnie
-  // const firstISO = `${firstDateParts[2]}-${firstDateParts[1]}-${firstDateParts[0]}`
+    dates.forEach((date) => {
+      const monthKey = `${date.getFullYear()}-${date.getMonth()}`
 
-  const firstDateObj = dates[0]
+      if (!groups[monthKey]) {
+        groups[monthKey] = []
+      }
+      groups[monthKey].push(date)
+    })
+    return groups
+  }
 
-  // getDay(): 0=Sun, 1=Mon, ..., 6=Sat
-  const firstDay = firstDateObj.getDay()
-
-  // Zamieniamy żeby tydzień zaczynał się od poniedziałku
-  const mondayIndex = (firstDay + 6) % 7
+  const groupedDates = groupedDatesByMonth(dates)
 
   return (
-    <div>
-      <h1>Availability Grid</h1>
-      <p>Nickname: {nickname}</p>
-      <p>Event Data: {JSON.stringify(eventData)}</p>
+    <>
+      <h1 className="mb-8">Availability Grid</h1>
 
-      <h1>{dates.length} days</h1>
+      {Object.entries(groupedDates).map(([monthKey, monthDates]) => {
+        // getDay(): 0=Sun, 1=Mon, ..., 6=Sat
+        const firstDateObj = monthDates[0].getDay()
+        // Week starts on Monday, so we adjust the index: 0=Mon, 1=Tue,
+        const mondayIndex = (firstDateObj + 6) % 7
 
-      {/* Date grid table */}
-      <div className="grid grid-cols-7 gap-2 mt-4">
-        {/* Puste pola */}
-        {Array.from({ length: mondayIndex }).map((_, i) => (
-          <div key={'empty-' + i}></div>
-        ))}
-        {dates.map((date, index) => (
-          <CalendarButton key={index} propDate={date} index={index} />
-        ))}
-      </div>
-    </div>
+        const monthName = monthDates[0].toLocaleString('en-EN', {
+          month: 'long',
+          year: 'numeric',
+        })
+
+        return (
+          <div
+            key={monthKey}
+            className="mb-8 w-full bg-slate-300 p-4 rounded-lg shadow-lg shadow-gray-800"
+          >
+            <h2 className="text-xl font-bold capitalize">{monthName}</h2>
+            <div>
+              {/* Date grid table */}
+              <div className="grid grid-cols-7 gap-2 mt-4">
+                {/* generate empty cells for days before the first day of the week */}
+                {Array.from({ length: mondayIndex }).map((_, i) => (
+                  <div key={'empty-' + i}></div>
+                ))}
+                {monthDates.map((date, index) => (
+                  <CalendarButton key={index} propDate={date} index={index} />
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </>
   )
 }
