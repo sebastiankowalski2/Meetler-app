@@ -1,12 +1,19 @@
-import { useState } from 'react'
+export default function CalendarButton({
+  propDate,
+  index,
+  isSelected,
+  onToggle,
+}) {
+  // Accept either a Date or a YYYY-MM-DD string and normalize to local Date.
+  const toLocalDate = (value) => {
+    if (typeof value === 'string') {
+      const [year, month, day] = value.split('-').map(Number)
+      return new Date(year, month - 1, day)
+    }
+    return new Date(value)
+  }
 
-export default function CalendarButton({ propDate, index }) {
-  const [isSelected, setIsSelected] = useState(false)
-
-  //   const parts = propDate.split('-') // ["07", "03", "2026"]
-  //   const isoDateString = `${parts[2]}-${parts[1]}-${parts[0]}`
-
-  const wrappedDate = new Date(propDate)
+  const wrappedDate = toLocalDate(propDate)
   const dayNotFixed = wrappedDate.getDay()
   const day = (dayNotFixed + 6) % 7
 
@@ -17,9 +24,7 @@ export default function CalendarButton({ propDate, index }) {
 
   return (
     <button
-      onClick={() => {
-        setIsSelected(!isSelected)
-      }}
+      onClick={onToggle}
       key={index}
       className={`text-center text-xs ${isSelected ? 'bg-blue-500' : 'bg-gray-400'} text-white p-2 rounded-lg mt-4 transition-colors duration-250 w-20 h-19 cursor-pointer`}
     >

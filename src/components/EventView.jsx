@@ -2,7 +2,7 @@ import NicknameForm from '../components/NicknameForm'
 import AvailabilityGrid from '../components/AvailabilityGrid'
 import { useState } from 'react'
 
-export default function EventView({ eventData }) {
+export default function EventView({ eventData, eventId }) {
   const [nickname, setNickname] = useState('')
   return (
     <div>
@@ -29,7 +29,11 @@ export default function EventView({ eventData }) {
       {nickname === '' ? (
         <NicknameForm setNickname={setNickname} />
       ) : (
-        <AvailabilityGrid eventData={eventData} />
+        <AvailabilityGrid
+          eventData={eventData}
+          eventId={eventId}
+          nickname={nickname}
+        />
       )}
     </div>
   )
