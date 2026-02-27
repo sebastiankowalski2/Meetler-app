@@ -1,11 +1,14 @@
-import { useState } from 'react'
 import CalendarButton from './CalendarButton'
 import { doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 
-export default function AvailabilityGrid({ eventData, eventId, nickname }) {
-  const [selectedDates, setSelectedDates] = useState({})
-
+export default function AvailabilityGrid({
+  eventData,
+  eventId,
+  nickname,
+  selectedDates,
+  setSelectedDates,
+}) {
   const daysCount = eventData.timeRangeDays
 
   // Generate an array of Date objects starting from today, with the length of daysCount
@@ -55,8 +58,6 @@ export default function AvailabilityGrid({ eventData, eventId, nickname }) {
   const groupedDates = groupedDatesByMonth(dates)
 
   const toggleDate = (date) => {
-    console.log('Toggling date:', date)
-    console.log('Before toggle, selectedDates:', selectedDates)
     // Store selection by date string (e.g. 2026-02-26: true/false).
     setSelectedDates((prev) => ({
       ...prev,
@@ -64,6 +65,7 @@ export default function AvailabilityGrid({ eventData, eventId, nickname }) {
     }))
   }
 
+  //TODO w przyszlosci przerzucic do EventView
   const saveAvailability = async () => {
     if (!nickname) return
 
@@ -82,6 +84,7 @@ export default function AvailabilityGrid({ eventData, eventId, nickname }) {
         updatedAt: new Date(),
       })
 
+      //TODO podmienic na jakis fajny toast, zeby nie bylo takie nagle i brzydkie
       alert('Saved!')
     } catch (error) {
       console.error(error)

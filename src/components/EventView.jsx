@@ -1,9 +1,42 @@
 import NicknameForm from '../components/NicknameForm'
 import AvailabilityGrid from '../components/AvailabilityGrid'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../firebase'
 
 export default function EventView({ eventData, eventId }) {
   const [nickname, setNickname] = useState('')
+  const [selectedDates, setSelectedDates] = useState({})
+
+  useEffect(() => {
+    const preloadAvailability = async () => {
+      if (!nickname) return
+
+      try {
+        const participantRef = doc(
+          db,
+          'events',
+          eventId,
+          'participants',
+          nickname.toLowerCase().trim(),
+        )
+
+        const snapshot = await getDoc(participantRef)
+
+        if (snapshot.exists()) {
+          const data = snapshot.data()
+          setSelectedDates(data.availability || {})
+        } else {
+          setSelectedDates({})
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    preloadAvailability()
+  }, [nickname, eventId])
+
   return (
     <div>
       <h1>Event View</h1>
@@ -33,6 +66,8 @@ export default function EventView({ eventData, eventId }) {
           eventData={eventData}
           eventId={eventId}
           nickname={nickname}
+          selectedDates={selectedDates}
+          setSelectedDates={setSelectedDates}
         />
       )}
     </div>
