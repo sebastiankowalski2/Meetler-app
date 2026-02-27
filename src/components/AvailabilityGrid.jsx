@@ -1,8 +1,10 @@
 import CalendarButton from './CalendarButton'
 import { doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase'
+import { toast } from 'react-hot-toast'
 
 export default function AvailabilityGrid({
+  isGuest,
   eventData,
   eventId,
   nickname,
@@ -67,7 +69,7 @@ export default function AvailabilityGrid({
 
   //TODO w przyszlosci przerzucic do EventView
   const saveAvailability = async () => {
-    if (!nickname) return
+    if (!nickname || nickname === 'Guest') return
 
     try {
       const participantRef = doc(
@@ -84,10 +86,10 @@ export default function AvailabilityGrid({
         updatedAt: new Date(),
       })
 
-      //TODO podmienic na jakis fajny toast, zeby nie bylo takie nagle i brzydkie
-      alert('Saved!')
+      toast.success('Availability saved successfully!')
     } catch (error) {
       console.error(error)
+      toast.error('Failed to save availability.')
     }
   }
 
@@ -124,6 +126,7 @@ export default function AvailabilityGrid({
                 ))}
                 {monthDates.map((date, index) => (
                   <CalendarButton
+                    isGuest={isGuest}
                     key={index}
                     propDate={date}
                     index={index}
@@ -138,12 +141,15 @@ export default function AvailabilityGrid({
         )
       })}
 
-      <button
-        onClick={saveAvailability}
-        className="bg-green-500 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-600 transition-colors duration-250 cursor-pointer"
-      >
-        Save Availability
-      </button>
+      {!isGuest && (
+        <button
+          disabled={isGuest}
+          onClick={saveAvailability}
+          className={`bg-green-500 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-600 transition-colors duration-250 ${isGuest ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+        >
+          Save Availability
+        </button>
+      )}
     </>
   )
 }

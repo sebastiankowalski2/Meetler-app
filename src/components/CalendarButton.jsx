@@ -3,6 +3,7 @@ export default function CalendarButton({
   index,
   isSelected,
   onToggle,
+  isGuest,
 }) {
   // Accept either a Date or a YYYY-MM-DD string and normalize to local Date.
   const toLocalDate = (value) => {
@@ -24,6 +25,7 @@ export default function CalendarButton({
 
   return (
     <button
+      disabled={isGuest}
       onClick={onToggle}
       key={index}
       className={`text-center text-xs ${isSelected ? 'bg-blue-500' : 'bg-gray-400'} text-white p-2 rounded-lg mt-4 transition-colors duration-250 w-20 h-19 cursor-pointer`}

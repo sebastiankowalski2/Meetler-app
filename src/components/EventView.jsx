@@ -3,10 +3,13 @@ import AvailabilityGrid from '../components/AvailabilityGrid'
 import { useState, useEffect } from 'react'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../firebase'
+import { toast } from 'react-hot-toast'
 
 export default function EventView({ eventData, eventId }) {
   const [nickname, setNickname] = useState('')
   const [selectedDates, setSelectedDates] = useState({})
+
+  const isGuest = nickname === 'Guest'
 
   useEffect(() => {
     const preloadAvailability = async () => {
@@ -26,10 +29,12 @@ export default function EventView({ eventData, eventId }) {
         if (snapshot.exists()) {
           const data = snapshot.data()
           setSelectedDates(data.availability || {})
+          toast.success('Loaded previous availability')
         } else {
           setSelectedDates({})
         }
       } catch (error) {
+        toast.error('Failed to load availability.')
         console.error(error)
       }
     }
@@ -63,6 +68,7 @@ export default function EventView({ eventData, eventId }) {
         <NicknameForm setNickname={setNickname} />
       ) : (
         <AvailabilityGrid
+          isGuest={isGuest}
           eventData={eventData}
           eventId={eventId}
           nickname={nickname}
