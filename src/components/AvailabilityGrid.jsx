@@ -114,12 +114,21 @@ export default function AvailabilityGrid({
         return (
           <div
             key={monthKey}
-            className="mb-8 w-full bg-slate-300 p-4 rounded-lg shadow-lg shadow-gray-800"
+            className="mb-8 w-full bg-slate-300 p-2 sm:p-4 rounded-lg shadow-lg shadow-gray-800"
           >
             <h2 className="text-xl font-bold capitalize">{monthName}</h2>
+            <div className="grid grid-cols-7 gap-1 md:gap-2 mt-2 md:mt-4">
+              <p>Mon</p>
+              <p>Tue</p>
+              <p>Wed</p>
+              <p>Thu</p>
+              <p>Fri</p>
+              <p>Sat</p>
+              <p>Sun</p>
+            </div>
             <div>
               {/* Date grid table */}
-              <div className="grid grid-cols-7 gap-2 mt-4">
+              <div className="grid grid-cols-7 gap-0.5 sm:gap-1 md:gap-2 lg:gap-4 mt-4">
                 {/* generate empty cells for days before the first day of the week */}
                 {Array.from({ length: mondayIndex }).map((_, i) => (
                   <div key={'empty-' + i}></div>

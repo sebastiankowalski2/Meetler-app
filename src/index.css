@@ -2,7 +2,7 @@
 
 @layer base {
   html {
-    @apply h-full;
+    @apply h-full w-full;
   }
 
   body {

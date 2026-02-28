@@ -15,25 +15,22 @@ export default function CalendarButton({
   }
 
   const wrappedDate = toLocalDate(propDate)
-  const dayNotFixed = wrappedDate.getDay()
-  const day = (dayNotFixed + 6) % 7
+  // const dayNotFixed = wrappedDate.getDay()
+  // const day = (dayNotFixed + 6) % 7
 
-  function getDayName(day) {
-    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    return daysOfWeek[day]
-  }
+  // function getDayName(day) {
+  //   const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  //   return daysOfWeek[day]
+  // }
 
   return (
     <button
       disabled={isGuest}
       onClick={onToggle}
       key={index}
-      className={`text-center text-xs ${isSelected ? 'bg-blue-500' : 'bg-gray-400'} text-white p-2 rounded-lg mt-4 transition-colors duration-250 w-20 h-19 cursor-pointer`}
+      className={`text-center text-xs sm:text-sm md:text-lg lg:text-xl ${isSelected ? 'bg-blue-500' : 'bg-gray-400'} text-white p-2 rounded-lg transition-colors duration-250 w-full sm:h-16 md:h-20 lg:h-26 h-10 cursor-pointer`}
     >
-      {wrappedDate.getDate()}-{wrappedDate.getMonth() + 1}-
-      {wrappedDate.getFullYear()}
-      <br></br>
-      {getDayName(day)}
+      {wrappedDate.getDate()}
     </button>
   )
 }
