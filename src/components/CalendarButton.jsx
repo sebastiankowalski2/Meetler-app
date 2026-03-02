@@ -22,7 +22,7 @@ export default function CalendarButton({
   //   const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   //   return daysOfWeek[day]
   // }
-
+  //animate-pulse
   return (
     <button
       disabled={isGuest}

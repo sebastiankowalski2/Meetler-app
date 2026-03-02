@@ -2,6 +2,7 @@ import CalendarButton from './CalendarButton'
 import { doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
+import { useState } from 'react'
 
 export default function AvailabilityGrid({
   isGuest,
@@ -11,6 +12,7 @@ export default function AvailabilityGrid({
   selectedDates,
   setSelectedDates,
 }) {
+  const [firstClick, setFirstClick] = useState(false)
   const daysCount = eventData.timeRangeDays
 
   // Generate an array of Date objects starting from today, with the length of daysCount
@@ -65,6 +67,7 @@ export default function AvailabilityGrid({
       ...prev,
       [date]: !prev[date],
     }))
+    setFirstClick(true)
   }
 
   //TODO w przyszlosci przerzucic do EventView
@@ -86,7 +89,9 @@ export default function AvailabilityGrid({
         updatedAt: new Date(),
       })
 
+      //TODO: make toast responsive on mobile and desktop.
       toast.success('Availability saved successfully!')
+      setFirstClick(false)
     } catch (error) {
       console.error(error)
       toast.error('Failed to save availability.')
@@ -95,7 +100,15 @@ export default function AvailabilityGrid({
 
   return (
     <>
-      <h1 className="mb-8">Availability Grid</h1>
+      {!isGuest && (
+        <button //zrobic go fixed
+          disabled={isGuest || !firstClick}
+          onClick={saveAvailability}
+          className={`text-sm sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
+        >
+          Save Availability
+        </button>
+      )}
 
       {Object.entries(groupedDates).map(([monthKey, monthDates]) => {
         // getDay(): 0=Sun, 1=Mon, ..., 6=Sat
@@ -139,6 +152,7 @@ export default function AvailabilityGrid({
                     key={index}
                     propDate={date}
                     index={index}
+                    firstClick={firstClick}
                     // !! - to convert to boolean, if selectedDates[date] is undefined it will be false, if it's true it will be true
                     isSelected={!!selectedDates[date]}
                     onToggle={() => toggleDate(date)}
@@ -149,16 +163,6 @@ export default function AvailabilityGrid({
           </div>
         )
       })}
-
-      {!isGuest && (
-        <button
-          disabled={isGuest}
-          onClick={saveAvailability}
-          className={`bg-green-500 text-white px-4 py-2 rounded-lg mt-4 hover:bg-green-600 transition-colors duration-250 ${isGuest ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-        >
-          Save Availability
-        </button>
-      )}
     </>
   )
 }

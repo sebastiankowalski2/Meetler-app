@@ -30,13 +30,9 @@ export default function EventPage() {
   console.log('Event data:', eventData)
   return (
     <>
-      <div className="absolute bg-white rounded-4xl p-0.5 top-1 left-1">
+      {/* <div className="absolute bg-white rounded-4xl p-0.5 top-1 left-1">
         <h2 className="text-sm">Event ID: {eventId}</h2>
-      </div>
-      <div>
-        <h1 className="text-3xl mb-4 mt-2 ">Event Page</h1>
-      </div>
-
+      </div> */}
       <EventView eventData={eventData} eventId={eventId} />
     </>
   )
