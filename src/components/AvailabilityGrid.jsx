@@ -80,16 +80,17 @@ export default function AvailabilityGrid({
         'events',
         eventId,
         'participants',
-        nickname.toLowerCase(),
+        nickname.trim().toLowerCase(),
       )
 
       await setDoc(participantRef, {
-        nickname: nickname.toLowerCase(),
+        nickname: nickname.trim().toLowerCase(),
         availability: selectedDates,
         updatedAt: new Date(),
       })
 
       //TODO: make toast responsive on mobile and desktop.
+
       toast.success('Availability saved successfully!')
       setFirstClick(false)
     } catch (error) {
@@ -104,7 +105,7 @@ export default function AvailabilityGrid({
         <button //zrobic go fixed
           disabled={isGuest || !firstClick}
           onClick={saveAvailability}
-          className={`text-sm sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
+          className={`text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
         >
           Save Availability
         </button>

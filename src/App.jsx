@@ -8,7 +8,12 @@ import { Toaster } from 'react-hot-toast'
 function App() {
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          className: 'meetler-toast',
+        }}
+      />
       <Routes>
         <Route path="/" element={<CreateEventPage />} />
         <Route path="/event/:eventId" element={<EventPage />} />

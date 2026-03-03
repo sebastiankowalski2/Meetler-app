@@ -21,7 +21,7 @@ export default function EventView({ eventData, eventId }) {
           'events',
           eventId,
           'participants',
-          nickname.toLowerCase().trim(),
+          nickname.toLowerCase().trim(), //jak cos nie bedzie dzialac to
         )
 
         const snapshot = await getDoc(participantRef)
@@ -45,7 +45,9 @@ export default function EventView({ eventData, eventId }) {
   return (
     <div>
       <h3 className="text-lg absolute bg-white rounded-sm p-0.5 top-2 left-2">
-        Hi, {nickname}
+        Hi,{' '}
+        {nickname.trim().charAt(0).toUpperCase() +
+          nickname.trim().slice(1).toLowerCase()}
       </h3>
 
       <div className="mt-12 justify-center align-middle items-center">

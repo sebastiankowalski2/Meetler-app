@@ -46,3 +46,16 @@
 .read-the-docs {
   color: #888;
 }
+
+.meetler-toast {
+  font-size: 16px;
+  padding: 10px 14px;
+}
+
+@media (max-width: 440px) {
+  .meetler-toast {
+    font-size: 14px;
+    padding: 6px 12px;
+    max-width: 280px;
+  }
+}
