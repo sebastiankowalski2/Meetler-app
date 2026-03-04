@@ -50,39 +50,47 @@ export default function EventView({ eventData, eventId }) {
           nickname.trim().slice(1).toLowerCase()}
       </h3>
 
-      <div className="mt-12 justify-center align-middle items-center">
-        <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-blue-500 font-bold">
-          Share this link with your friends:{' '}
-        </h2>
-        <button
-          className="text-sm text-white rounded-2xl px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-all duration-250 cursor-pointer"
-          onClick={() => {
-            navigator.clipboard.writeText(window.location.href)
-            toast.success('Link copied to clipboard!')
-          }}
-        >
-          Copy Link
-        </button>
-      </div>
-
-      <div className="mt-5 justify-center flex align-middle items-center">
-        <span className="text-2xl md:text-2xl lg:text-4xl pr-1">🏷️</span>
-        <h2 className="text-2xl md:text-2xl lg:text-4xl mb-2 mt-2 pr-2 pl-2 text-blue-500 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
-          {eventData.eventName.toUpperCase()}
-        </h2>
-        <span className="text-2xl md:text-2xl lg:text-4xl pl-1">🏷️</span>
-      </div>
-
-      {/* Only show the location if it exists in the event data - if the user didnt fill it out, we dont want to show an empty location field*/}
-      {eventData.eventLocation && (
-        <div className="mb-1 justify-center flex align-middle items-center">
-          <span className="text-2xl md:text-2xl lg:text-4xl pb-2 pr-1">📍</span>
-          <h2 className="text-2xl md:text-2xl lg:text-4xl mb-4 mt-2 pr-2 pl-2 text-yellow-300 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
-            {eventData.eventLocation.toUpperCase()}
+      <div className="flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-10 md:gap-20 lg:gap-30">
+        <div className=" justify-center align-middle items-center mb-10 sm:mb-0">
+          <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-blue-500 font-bold">
+            Share this link with your friends:{' '}
           </h2>
-          <span className="text-2xl md:text-2xl lg:text-4xl pb-2 pl-1">📍</span>
+          <button
+            className="text-sm text-white rounded-2xl px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-all duration-250 cursor-pointer"
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href)
+              toast.success('Link copied to clipboard!')
+            }}
+          >
+            Copy Link
+          </button>
         </div>
-      )}
+
+        <div className="pr-5 pl-5 max-w-88 sm:max-w-200 items-center border-10 border-blue-400 bg-blue-200 flex flex-col rounded-2xl gap-4">
+          <div className="mt-5 justify-center flex align-middle items-center">
+            <span className="text-2xl md:text-2xl lg:text-4xl pr-1">🏷️</span>
+            <h2 className="text-2xl md:text-2xl lg:text-4xl pr-2 pl-2 text-blue-500 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
+              {eventData.eventName.toUpperCase()}
+            </h2>
+            <span className="text-2xl md:text-2xl lg:text-4xl pl-1">🏷️</span>
+          </div>
+
+          {/* Only show the location if it exists in the event data - if the user didnt fill it out, we dont want to show an empty location field*/}
+          {eventData.eventLocation && (
+            <div className="mb-1 justify-center flex align-middle items-center">
+              <span className="text-2xl md:text-2xl lg:text-4xl pb-2 pr-1">
+                📍
+              </span>
+              <h2 className="text-2xl md:text-2xl lg:text-4xl mb-4 mt-2 pr-2 pl-2 text-yellow-300 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
+                {eventData.eventLocation.toUpperCase()}
+              </h2>
+              <span className="text-2xl md:text-2xl lg:text-4xl pb-2 pl-1">
+                📍
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
       {nickname === '' ? (
         <NicknameForm setNickname={setNickname} />
       ) : (

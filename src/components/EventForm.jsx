@@ -46,10 +46,12 @@ export default function EventForm() {
   return (
     <>
       <div className="flex items-center justify-center align-middle">
-        <div className="form-group w-100 items-center border-10 border-blue-400 bg-blue-200 flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl">
+        <div className="form-group sm:w-100 w-88 items-center border-10 border-blue-400 bg-blue-200 flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl">
           <form onSubmit={handleSubmit}>
             <div className="w-75">
-              <label htmlFor="eventName">Event Name: </label>
+              <label className="font-bold" htmlFor="eventName">
+                Event Name:{' '}
+              </label>
               <input
                 className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-4 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
                 type="text"
@@ -61,7 +63,9 @@ export default function EventForm() {
                 required
               />
 
-              <label htmlFor="eventLocation">Location: </label>
+              <label className="font-bold" htmlFor="eventLocation">
+                Location:{' '}
+              </label>
               <input
                 className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-4 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
                 type="text"
@@ -70,9 +74,10 @@ export default function EventForm() {
                 name="eventLocation"
                 value={formData.eventLocation}
                 onChange={handleChange}
+                required
               />
 
-              <label htmlFor="timeRangeDays">
+              <label className="font-bold" htmlFor="timeRangeDays">
                 Time Range (Days - from now on):{' '}
               </label>
               <input
