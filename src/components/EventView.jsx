@@ -110,7 +110,7 @@ export default function EventView({ eventData, eventId }) {
           </button>
         </div>
 
-        <div className="pr-5 pl-5 max-w-88 sm:max-w-200 items-center border-10 border-blue-400 bg-blue-200 flex flex-col rounded-2xl gap-4">
+        <div className="pr-5 pl-5 max-w-88 sm:max-w-200 items-center border-10 border-blue-400 bg-blue-200 rounded-2xl flex flex-col gap-4">
           <div className="mt-5 justify-center flex align-middle items-center">
             <span className="text-2xl md:text-2xl lg:text-4xl pr-1">🏷️</span>
             <h2 className="text-2xl md:text-2xl lg:text-4xl pr-2 pl-2 text-blue-500 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
