@@ -1,13 +1,14 @@
 import NicknameForm from '../components/NicknameForm'
 import AvailabilityGrid from '../components/AvailabilityGrid'
 import { useState, useEffect } from 'react'
-import { doc, getDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 
 export default function EventView({ eventData, eventId }) {
   const [nickname, setNickname] = useState('')
   const [selectedDates, setSelectedDates] = useState({})
+  const [participants, setParticipants] = useState([])
 
   const isGuest = nickname === 'Guest'
 
@@ -42,12 +43,55 @@ export default function EventView({ eventData, eventId }) {
     preloadAvailability()
   }, [nickname, eventId])
 
+  const fetchParticipants = async () => {
+    const participantsRef = collection(db, 'events', eventId, 'participants')
+
+    const snapshot = await getDocs(participantsRef)
+
+    const participants = snapshot.docs.map((doc) => doc.data())
+    return participants
+  }
+
+  useEffect(() => {
+    fetchParticipants()
+      .then((data) => {
+        setParticipants(data)
+      })
+      .catch((error) => {
+        console.error('Error fetching participants:', error)
+      })
+  }, [])
+
+  const buildScoreMap = (participants) => {
+    const score = {}
+
+    participants.forEach((participant) => {
+      Object.entries(participant.availability || {}).forEach(
+        ([date, value]) => {
+          if (value) {
+            score[date] = (score[date] || 0) + 1
+          }
+        },
+      )
+    })
+    return score
+  }
+
+  const scoreMap = buildScoreMap(participants)
+
   return (
     <div>
-      <h3 className="text-lg absolute bg-white rounded-sm p-0.5 top-2 left-2">
+      <h3 className="text-lg font-bold text-white absolute bg-blue-500 rounded-sm p-1 top-2 left-2">
         Hi,{' '}
         {nickname.trim().charAt(0).toUpperCase() +
           nickname.trim().slice(1).toLowerCase()}
+      </h3>
+
+      <h3 className="text-lg font-bold text-white absolute bg-blue-500 rounded-sm p-1 top-2 right-2">
+        Participants:{' '}
+        <span className="bg-amber-300 text-black font-bold px-2 rounded-full">
+          {participants.length}
+        </span>
       </h3>
 
       <div className="flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-10 md:gap-20 lg:gap-30">
@@ -95,6 +139,8 @@ export default function EventView({ eventData, eventId }) {
         <NicknameForm setNickname={setNickname} />
       ) : (
         <AvailabilityGrid
+          scoreMap={scoreMap}
+          participantsCount={participants.length}
           isGuest={isGuest}
           eventData={eventData}
           eventId={eventId}

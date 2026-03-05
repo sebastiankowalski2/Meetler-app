@@ -27,7 +27,6 @@ export default function EventPage() {
   if (loading) return <p>Loading...</p>
 
   if (!eventData) return <p>Event not found</p>
-  console.log('Event data:', eventData)
   return (
     <>
       {/* <div className="absolute bg-white rounded-4xl p-0.5 top-1 left-1">

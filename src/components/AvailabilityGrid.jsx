@@ -5,6 +5,8 @@ import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 
 export default function AvailabilityGrid({
+  scoreMap,
+  participantsCount,
   isGuest,
   eventData,
   eventId,
@@ -68,6 +70,7 @@ export default function AvailabilityGrid({
       [date]: !prev[date],
     }))
     setFirstClick(true)
+    console.log(scoreMap)
   }
 
   //TODO w przyszlosci przerzucic do EventView
@@ -99,13 +102,18 @@ export default function AvailabilityGrid({
     }
   }
 
+  //co z przypadkiem jak jest pusty scoremap? nie wplywa to zlena wydajnosc?
+
+  const scores = Object.values(scoreMap)
+  const maxScore = Math.max(...scores, 0)
+
   return (
     <>
       {!isGuest && (
         <button //zrobic go fixed
           disabled={isGuest || !firstClick}
           onClick={saveAvailability}
-          className={`text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 mt-4 top-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
+          className={`z-50 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 mt-4 top-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
         >
           Save Availability
         </button>
@@ -149,6 +157,9 @@ export default function AvailabilityGrid({
                 ))}
                 {monthDates.map((date, index) => (
                   <CalendarButton
+                    scoreMap={scoreMap}
+                    maxScore={maxScore}
+                    participantsCount={participantsCount}
                     isGuest={isGuest}
                     key={index}
                     propDate={date}
