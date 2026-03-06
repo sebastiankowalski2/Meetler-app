@@ -11,6 +11,16 @@
   }
 }
 
+@media (max-width: 640px) {
+  .btn {
+    font-size: 10px;
+    padding-right: 2px;
+    padding-left: 2px;
+    right: 1px;
+    bottom: 1px;
+  }
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

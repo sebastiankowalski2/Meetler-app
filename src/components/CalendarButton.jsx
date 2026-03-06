@@ -39,11 +39,14 @@ export default function CalendarButton({
       disabled={isGuest}
       onClick={onToggle}
       key={index}
-      className={`hover:opacity-80 text-center text-xs sm:text-sm md:text-lg lg:text-xl transition-all duration-200 ${isSelected ? 'bg-blue-500' : 'bg-gray-400'} text-white p-2 rounded-lg transition-colors duration-250 w-full sm:h-16 md:h-20 lg:h-26 h-10 cursor-pointer ${scoreForDate === participantsCount && scoreForDate !== 0 ? ' border-3 sm:border-5 md:border-6 lg:border-7 border-red-500' : ''} ${orangeBorder ? ' border-3 sm:border-5 md:border-6 lg:border-7 border-yellow-500' : ''}
+      className={`relative hover:opacity-80 text-center text-xs sm:text-sm md:text-lg lg:text-xl transition-all duration-200 ${isSelected ? 'bg-blue-500' : 'bg-gray-400'} text-white p-2 rounded-lg transition-colors duration-250 w-full sm:h-16 md:h-20 lg:h-26 h-10 cursor-pointer ${scoreForDate === participantsCount && scoreForDate !== 0 ? ' border-3 sm:border-5 md:border-6 lg:border-7 border-red-500' : ''} ${orangeBorder ? ' border-3 sm:border-5 md:border-6 lg:border-7 border-yellow-500' : ''}
         
         `} //
     >
       {wrappedDate.getDate()}
+      <span className="btn absolute z-50 right-1 bottom-1 bg-amber-300 sm:text-sm text-black font-bold px-1 rounded-full leading-none">
+        {scoreForDate}
+      </span>
     </button>
   )
 }
