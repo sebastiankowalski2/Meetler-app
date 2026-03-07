@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export default function NicknameForm({ setNickname }) {
+export default function NicknameForm({ setNickname, eventId }) {
   const [inputValue, setInputValue] = useState('')
 
   const handleChange = (e) => {
@@ -13,7 +13,7 @@ export default function NicknameForm({ setNickname }) {
     console.log('Nickname submitted:', inputValue)
 
     setNickname(inputValue)
-
+    localStorage.setItem(`nickname-${eventId}`, inputValue)
     setInputValue('')
   }
   // Set the nickname to "Guest" when the guest button is clicked - if user is a Guest, they can only see the availability grid but they cant edit it.

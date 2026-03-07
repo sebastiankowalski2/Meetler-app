@@ -4,9 +4,12 @@ import { useState, useEffect } from 'react'
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
+import ParticipantsDropdown from './ParticipantsDropdown'
 
 export default function EventView({ eventData, eventId }) {
-  const [nickname, setNickname] = useState('')
+  const [nickname, setNickname] = useState(
+    localStorage.getItem(`nickname-${eventId}`) || '',
+  )
   const [selectedDates, setSelectedDates] = useState({})
   const [participants, setParticipants] = useState([])
 
@@ -14,8 +17,9 @@ export default function EventView({ eventData, eventId }) {
 
   useEffect(() => {
     const preloadAvailability = async () => {
+      console.log('first')
       if (!nickname) return
-
+      console.log('Preloading availability for nickname:', nickname)
       try {
         const participantRef = doc(
           db,
@@ -87,12 +91,14 @@ export default function EventView({ eventData, eventId }) {
           nickname.trim().slice(1).toLowerCase()}
       </h3>
 
-      <h3 className="text-lg font-bold text-white absolute bg-blue-500 rounded-sm p-1 top-2 right-2">
+      {/* <h3 className="text-lg font-bold text-white absolute bg-blue-500 rounded-sm p-1 top-2 right-2">
         Participants:{' '}
         <span className="bg-amber-300 text-black font-bold px-2 rounded-full">
           {participants.length}
         </span>
-      </h3>
+      </h3> */}
+
+      <ParticipantsDropdown participants={participants} />
 
       <div className="flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-10 md:gap-20 lg:gap-30">
         <div className=" justify-center align-middle items-center mb-10 sm:mb-0">
@@ -136,7 +142,7 @@ export default function EventView({ eventData, eventId }) {
         </div>
       </div>
       {nickname === '' ? (
-        <NicknameForm setNickname={setNickname} />
+        <NicknameForm eventId={eventId} setNickname={setNickname} />
       ) : (
         <AvailabilityGrid
           scoreMap={scoreMap}
