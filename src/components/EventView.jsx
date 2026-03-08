@@ -5,6 +5,7 @@ import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 import ParticipantsDropdown from './ParticipantsDropdown'
+import HowItWorks from './HowItWorks'
 
 export default function EventView({ eventData, eventId }) {
   const [nickname, setNickname] = useState(
@@ -47,24 +48,18 @@ export default function EventView({ eventData, eventId }) {
     preloadAvailability()
   }, [nickname, eventId])
 
-  const fetchParticipants = async () => {
-    const participantsRef = collection(db, 'events', eventId, 'participants')
-
-    const snapshot = await getDocs(participantsRef)
-
-    const participants = snapshot.docs.map((doc) => doc.data())
-    return participants
-  }
-
   useEffect(() => {
-    fetchParticipants()
-      .then((data) => {
-        setParticipants(data)
-      })
-      .catch((error) => {
-        console.error('Error fetching participants:', error)
-      })
-  }, [])
+    const fetchParticipants = async () => {
+      const participantsRef = collection(db, 'events', eventId, 'participants')
+      const snapshot = await getDocs(participantsRef)
+      const participants = snapshot.docs.map((doc) => doc.data())
+      setParticipants(participants)
+    }
+
+    fetchParticipants().catch((error) => {
+      console.error('Error fetching participants:', error)
+    })
+  }, [participants.length, eventId])
 
   const buildScoreMap = (participants) => {
     const score = {}
@@ -91,20 +86,25 @@ export default function EventView({ eventData, eventId }) {
           nickname.trim().slice(1).toLowerCase()}
       </h3>
 
-      {/* <h3 className="text-lg font-bold text-white absolute bg-blue-500 rounded-sm p-1 top-2 right-2">
-        Participants:{' '}
-        <span className="bg-amber-300 text-black font-bold px-2 rounded-full">
-          {participants.length}
-        </span>
-      </h3> */}
+      <HowItWorks EventView={true} />
 
       <ParticipantsDropdown participants={participants} />
 
-      <div className="flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-10 md:gap-20 lg:gap-30">
-        <div className=" justify-center align-middle items-center mb-10 sm:mb-0">
+      <div
+        style={{
+          position: 'relative',
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          zIndex: 1,
+        }}
+        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl  flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-4 md:gap-20 lg:gap-30"
+      >
+        <div className="justify-center align-middle items-center mb-5 sm:mb-0">
           <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-blue-500 font-bold">
-            Share this link with your friends:{' '}
+            Share this link with your friends:<br></br>
+            <span className="text-xs text-white">{window.location.href}</span>
           </h2>
+
           <button
             className="text-sm text-white rounded-2xl px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-all duration-250 cursor-pointer"
             onClick={() => {
@@ -116,26 +116,25 @@ export default function EventView({ eventData, eventId }) {
           </button>
         </div>
 
-        <div className="pr-5 pl-5 max-w-88 sm:max-w-200 items-center border-10 border-blue-400 bg-blue-200 rounded-2xl flex flex-col gap-4">
+        <div className="px-5 max-w-88 sm:max-w-200 items-center rounded-2xl flex flex-col gap-4">
           <div className="mt-5 justify-center flex align-middle items-center">
             <span className="text-2xl md:text-2xl lg:text-4xl pr-1">🏷️</span>
-            <h2 className="text-2xl md:text-2xl lg:text-4xl pr-2 pl-2 text-blue-500 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
+            <h2 className="text-2xl font-extrabold md:text-2xl lg:text-4xl pr-2 pl-2 text-blue-500 text-shadow-lg inset-shadow-sm shadow-sm ">
               {eventData.eventName.toUpperCase()}
             </h2>
             <span className="text-2xl md:text-2xl lg:text-4xl pl-1">🏷️</span>
           </div>
 
-          {/* Only show the location if it exists in the event data - if the user didnt fill it out, we dont want to show an empty location field*/}
           {eventData.eventLocation && (
             <div className="mb-1 justify-center flex align-middle items-center">
               <span className="text-2xl md:text-2xl lg:text-4xl pb-2 pr-1">
-                📍
+                🗺️
               </span>
-              <h2 className="text-2xl md:text-2xl lg:text-4xl mb-4 mt-2 pr-2 pl-2 text-yellow-300 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
+              <h2 className="text-xl md:text-2xl lg:text-4xl mb-4 mt-2 pr-2 pl-2 text-yellow-300 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
                 {eventData.eventLocation.toUpperCase()}
               </h2>
               <span className="text-2xl md:text-2xl lg:text-4xl pb-2 pl-1">
-                📍
+                🗺️
               </span>
             </div>
           )}

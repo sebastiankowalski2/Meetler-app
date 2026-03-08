@@ -70,7 +70,6 @@ export default function AvailabilityGrid({
       [date]: !prev[date],
     }))
     setFirstClick(true)
-    console.log(scoreMap)
   }
 
   //TODO w przyszlosci przerzucic do EventView
@@ -113,7 +112,7 @@ export default function AvailabilityGrid({
         <button //zrobic go fixed
           disabled={isGuest || !firstClick}
           onClick={saveAvailability}
-          className={`z-50 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 mt-4 top-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
+          className={`z-50 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
         >
           Save Availability
         </button>
@@ -135,6 +134,10 @@ export default function AvailabilityGrid({
 
         return (
           <div
+            style={{
+              backdropFilter: 'blur(10px)',
+              backgroundColor: 'rgba(255, 255, 255, 0.25)',
+            }}
             key={monthKey}
             className="mb-8 w-full bg-slate-300 p-2 sm:p-4 rounded-lg shadow-lg shadow-gray-800"
           >

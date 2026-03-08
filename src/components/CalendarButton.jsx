@@ -36,14 +36,23 @@ export default function CalendarButton({
 
   return (
     <button
+      //ciekawe do przemyslenia
+      style={{
+        backdropFilter: 'blur(10px)',
+        //backgroundColor: 'rgba(255, 255, 255, 0.5)',
+      }}
       disabled={isGuest}
       onClick={onToggle}
       key={index}
-      className={`relative hover:opacity-80 text-center text-xs sm:text-sm md:text-lg lg:text-xl transition-all duration-200 ${isSelected ? 'bg-blue-500' : 'bg-gray-400'} text-white p-2 rounded-lg transition-colors duration-250 w-full sm:h-16 md:h-20 lg:h-26 h-10 cursor-pointer ${scoreForDate === participantsCount && scoreForDate !== 0 ? ' border-3 sm:border-5 md:border-6 lg:border-7 border-red-500' : ''} ${orangeBorder ? ' border-3 sm:border-5 md:border-6 lg:border-7 border-yellow-500' : ''}
+      className={`relative bg-transparent border-2 hover:opacity-70 opacity-100 text-center text-xs sm:text-sm md:text-lg lg:text-xl transition-all duration-200 text-black p-2 rounded-lg w-full sm:h-16 md:h-20 lg:h-26 h-10 cursor-pointer ${scoreForDate === participantsCount && scoreForDate !== 0 ? 'shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_30px_rgba(255,0,0,1)] sm:shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_40px_rgba(255,0,0,1)] md:shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_55px_rgba(255,0,0,1)] lg:shadow-[0_0_25px_rgba(255,0,0,1),inset_0_0_70px_rgba(255,0,0,1)]' : 'border-white'} ${orangeBorder ? 'shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_30px_rgba(255,130,0,1)] sm:shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_40px_rgba(255,130,0,1)] md:shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_55px_rgba(255,130,0,1)] lg:shadow-[0_0_25px_rgba(255,105,0,1),inset_0_0_70px_rgba(255,130,0,1)]' : 'border-white'}
         
         `} //
     >
-      {wrappedDate.getDate()}
+      <span
+        className={`transition-all duration-200 ${isSelected ? 'bg-blue-500 rounded-full px-1 py-0.5' : 'bg-transparent'} ${wrappedDate.getDate() < 10 ? 'px-1.5 sm:px-2 md:px-2.5' : ''} font-bold`}
+      >
+        {wrappedDate.getDate()}
+      </span>
       <span className="btn absolute z-50 right-1 bottom-1 bg-amber-300 sm:text-sm text-black font-bold px-1 rounded-full leading-none">
         {scoreForDate}
       </span>

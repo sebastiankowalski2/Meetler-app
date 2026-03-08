@@ -1,23 +1,46 @@
 import React from 'react'
 
-export default function HowItWorks() {
+export default function HowItWorks({ EventView, EventPage }) {
   return (
     <>
       <div className="flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center w-88 p-4 sm:mt-24 mt-10 m-2 bg-gray-100 rounded-md shadow-2xl shadow-black">
+        <div
+          className={`flex ${EventPage ? 'mt-12' : ' mt-24'} flex-col items-center justify-center p-4 mx-2 bg-gray-100 rounded-md shadow-2xl shadow-black ${EventView ? ' w-92' : 'w-88 '}`}
+        >
           <h1 className="text-2xl font-extrabold mb-4">📌How it works?</h1>
-          <ul className="gap-4 text-left">
-            <li className="font-bold text-md">1. Create an event.</li>
+          <ol style={{ listStyleType: 'decimal' }} className="gap-4 text-left">
+            {!EventView && (
+              <li className="font-bold text-md">Create an event.</li>
+            )}
+
             <li className="font-bold text-md">
-              2. Mark the days when you are available.{' '}
+              Mark the days when you are available.{' '}
             </li>
-            <li className="font-bold text-md">
-              3. Share the event link with others.{' '}
-            </li>
-            <li className="font-bold text-md">
-              4. Easily find the best meeting dates.
-            </li>
-          </ul>
+
+            {!EventView && (
+              <li className="font-bold text-md">
+                Share the event link with others.{' '}
+              </li>
+            )}
+            {!EventView && (
+              <li className="font-bold text-md">
+                Easily find the best meeting dates.
+              </li>
+            )}
+            {!EventPage && (
+              <li className="font-bold text-md">Red - Everyone can go.</li>
+            )}
+            {!EventPage && (
+              <li className="font-bold text-md">
+                Orange - Second most popular dates.{' '}
+              </li>
+            )}
+            {!EventPage && (
+              <li className="font-bold text-md">
+                Change your availability at any time.
+              </li>
+            )}
+          </ol>
         </div>
       </div>
     </>
