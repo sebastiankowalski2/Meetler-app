@@ -35,6 +35,12 @@ export default function CalendarButton({
 
   const people = dateParticipantsMap[propDate] || []
 
+  window.addEventListener('scroll', () => {
+    if (hovered) {
+      setHovered(false)
+    }
+  })
+
   return (
     <div>
       <button
@@ -43,10 +49,12 @@ export default function CalendarButton({
           backdropFilter: 'blur(10px)',
           //backgroundColor: 'rgba(255, 255, 255, 0.5)',
         }}
-        disabled={isGuest}
-        onClick={onToggle}
+        //disabled={isGuest}
+        onClick={() => {
+          if (!isGuest) onToggle()
+        }}
         key={index}
-        className={`relative bg-transparent border-2 hover:opacity-70 opacity-100 text-center text-xs sm:text-sm md:text-lg lg:text-xl transition-all duration-200 text-black p-2 rounded-lg w-full sm:h-16 md:h-20 lg:h-26 h-10 cursor-pointer ${scoreForDate === participantsCount && scoreForDate !== 0 ? 'shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_30px_rgba(255,0,0,1)] sm:shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_40px_rgba(255,0,0,1)] md:shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_55px_rgba(255,0,0,1)] lg:shadow-[0_0_25px_rgba(255,0,0,1),inset_0_0_70px_rgba(255,0,0,1)]' : 'border-white'} ${orangeBorder ? 'shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_30px_rgba(255,130,0,1)] sm:shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_40px_rgba(255,130,0,1)] md:shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_55px_rgba(255,130,0,1)] lg:shadow-[0_0_25px_rgba(255,105,0,1),inset_0_0_70px_rgba(255,130,0,1)]' : 'border-white'}
+        className={`${isGuest ? 'opacity-50' : 'cursor-pointer hover:opacity-70'} relative bg-transparent border-2 opacity-100 text-center text-xs sm:text-sm md:text-lg lg:text-xl transition-all duration-200 text-black p-2 rounded-lg w-full sm:h-16 md:h-20 lg:h-26 h-10  ${scoreForDate === participantsCount && scoreForDate !== 0 ? 'shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_30px_rgba(255,0,0,1)] sm:shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_40px_rgba(255,0,0,1)] md:shadow-[0_0_15px_rgba(255,0,0,1),inset_0_0_55px_rgba(255,0,0,1)] lg:shadow-[0_0_25px_rgba(255,0,0,1),inset_0_0_70px_rgba(255,0,0,1)]' : 'border-white'} ${orangeBorder ? 'shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_30px_rgba(255,130,0,1)] sm:shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_40px_rgba(255,130,0,1)] md:shadow-[0_0_15px_rgba(255,105,0,1),inset_0_0_55px_rgba(255,130,0,1)] lg:shadow-[0_0_25px_rgba(255,105,0,1),inset_0_0_70px_rgba(255,130,0,1)]' : 'border-white'}
         `}
         onMouseEnter={(e) => {
           const rect = e.currentTarget.getBoundingClientRect()
@@ -56,7 +64,7 @@ export default function CalendarButton({
         onMouseLeave={() => setHovered(false)}
       >
         <span
-          className={`transition-all duration-200 ${isSelected ? 'bg-blue-500 rounded-full px-1 py-0.5' : 'bg-transparent'} ${wrappedDate.getDate() < 10 ? 'px-1.5 sm:px-2 md:px-2.5' : ''} font-bold`}
+          className={`transition-all duration-200 ${isSelected ? 'bg-primary text-secondary rounded-full px-1 py-0.5' : 'bg-transparent'} ${wrappedDate.getDate() < 10 ? 'px-1.5 sm:px-2 md:px-2.5' : ''} font-bold`}
         >
           {wrappedDate.getDate()}
         </span>
@@ -71,7 +79,7 @@ export default function CalendarButton({
                 top: tooltipPos.top,
                 left: tooltipPos.left,
               }}
-              className={`z-9999 transition-all duration-5000 bg-black text-white text-xs p-2 rounded ${hovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              className={`text-white bg-black text-xs p-2 `}
             >
               {people.length > 0 ? (
                 <div>

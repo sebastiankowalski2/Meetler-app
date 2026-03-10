@@ -34,7 +34,14 @@ export default function EventView({ eventData, eventId }) {
         if (snapshot.exists()) {
           const data = snapshot.data()
           setSelectedDates(data.availability || {})
-          toast.success('Loaded previous availability')
+          toast.success('Loaded previous availability', {
+            style: {
+              fontStyle: 'extra-bold',
+            },
+            iconTheme: {
+              primary: 'var(--color-primary)',
+            },
+          })
         } else {
           setSelectedDates({})
         }
@@ -112,15 +119,22 @@ export default function EventView({ eventData, eventId }) {
         className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl  flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-20 md:gap-20 lg:gap-30 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
       >
         <div className="justify-center align-middle items-center mb-5 sm:mb-0">
-          <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-blue-500 font-bold">
+          <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-primary font-bold">
             Share this link with your friends:<br></br>
           </h2>
 
           <button
-            className="text-sm text-white rounded-2xl px-4 py-2 bg-blue-500 hover:bg-blue-600 transition-all duration-250 cursor-pointer"
+            className="text-sm text-white rounded-2xl px-4 py-2 bg-primary hover:bg-primary-hover transition-all duration-250 cursor-pointer"
             onClick={() => {
               navigator.clipboard.writeText(window.location.href)
-              toast.success('Link copied to clipboard!')
+              toast.success('Link copied to clipboard!', {
+                style: {
+                  fontStyle: 'extra-bold',
+                },
+                iconTheme: {
+                  primary: 'var(--color-primary)',
+                },
+              })
             }}
           >
             Copy Link
@@ -130,7 +144,7 @@ export default function EventView({ eventData, eventId }) {
         <div className="px-5 max-w-88 sm:max-w-200 items-center rounded-2xl flex flex-col gap-4">
           <div className="mt-5 justify-center flex align-middle items-center">
             <span className="text-2xl md:text-2xl lg:text-4xl pr-1">🏷️</span>
-            <h2 className="text-2xl font-extrabold md:text-2xl lg:text-4xl pr-2 pl-2 text-blue-500 text-shadow-lg inset-shadow-sm shadow-sm ">
+            <h2 className="text-2xl font-extrabold md:text-2xl lg:text-4xl pr-2 pl-2 text-primary text-shadow-lg inset-shadow-sm shadow-sm ">
               {eventData.eventName.toUpperCase()}
             </h2>
             <span className="text-2xl md:text-2xl lg:text-4xl pl-1">🏷️</span>
@@ -138,13 +152,13 @@ export default function EventView({ eventData, eventId }) {
 
           {eventData.eventLocation && (
             <div className="mb-1 justify-center flex align-middle items-center">
-              <span className="text-2xl md:text-2xl lg:text-4xl pb-2 pr-1">
+              <span className="text-xl md:text-xl lg:text-2xl pb-2 pr-1">
                 🗺️
               </span>
-              <h2 className="text-xl md:text-2xl lg:text-4xl mb-4 mt-2 pr-2 pl-2 text-yellow-300 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
+              <h2 className="text-xl md:text-xl lg:text-2xl mb-4 mt-2 pr-2 pl-2 text-yellow-300 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
                 {eventData.eventLocation.toUpperCase()}
               </h2>
-              <span className="text-2xl md:text-2xl lg:text-4xl pb-2 pl-1">
+              <span className="text-xl md:text-xl lg:text-2xl pb-2 pl-1">
                 🗺️
               </span>
             </div>

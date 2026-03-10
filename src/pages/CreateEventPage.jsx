@@ -1,23 +1,56 @@
 import EventForm from '../components/EventForm'
 import HowItWorks from '../components/HowItWorks'
 import WebImage from '../assets/web.png'
+import { useState } from 'react'
 
 export default function CreateEventPage() {
+  const [mClicked, setMClicked] = useState(false)
+
+  function handleMClick() {
+    setMClicked(!mClicked)
+  }
 
   return (
-    <div className='items-center align-middle justify-center flex flex-col mb-4 gap-10'>
+    <div className="items-center align-middle justify-center flex flex-col mb-4 gap-10">
       <div className="relative w-50">
         <img
-          className={`transition-all duration-200 absolute -left-3.5 w-20 h-auto shadow-2xl shadow-black rounded-full top-5 cursor-pointer hover:scale-95`}
+          onClick={handleMClick}
+          className={`active:scale-95 absolute -left-3.5 w-20 h-auto shadow-2xl shadow-black rounded-full top-5 cursor-pointer`}
           src={WebImage}
           alt="Web Image"
         />
-        <h1 className="text-blue-500 text-5xl pt-7 font-extrabold "><span className='text-6xl'>M</span>eetler</h1>
+        <h1 className="text-primary text-5xl pt-7 font-extrabold ">
+          <span className="text-6xl">M</span>eetler
+        </h1>
       </div>
-      
+
       <HowItWorks EventPage={true} />
-      <h1 className="text-3xl pt-10 font-extrabold ">Create Your Event</h1>
-      <EventForm />
+      <div
+        style={{
+          position: 'relative',
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.3)',
+          zIndex: 1,
+        }}
+        className="flex flex-col items-center align-middle justify-center  shadow-lg shadow-white/50 px-1.5 sm:px-20 rounded-3xl gap-4 mt-4 pb-4"
+      >
+        <h1
+          className={`perspective-[1000px] text-3xl pt-8 font-extrabold mb-3 transition-all duration-1000`}
+        >
+          Create{' '}
+          <span
+            className={`inline-block ${
+              mClicked
+                ? 'transform-3d -translate-z-1000px -translate-y-200px animate-spin text-red-600'
+                : ''
+            } transition-all duration-8000`}
+          >
+            Your
+          </span>{' '}
+          Event
+        </h1>
+        <EventForm mClicked={mClicked} />
+      </div>
     </div>
   )
 }

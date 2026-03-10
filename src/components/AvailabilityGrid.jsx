@@ -94,7 +94,14 @@ export default function AvailabilityGrid({
 
       //TODO: make toast responsive on mobile and desktop.
 
-      toast.success('Availability saved successfully!')
+      toast.success('Availability saved successfully!', {
+        style: {
+          fontStyle: 'extra-bold',
+        },
+        iconTheme: {
+          primary: 'var(--color-primary)',
+        },
+      })
       setFirstClick(false)
     } catch (error) {
       console.error(error)
@@ -113,7 +120,7 @@ export default function AvailabilityGrid({
         <button //zrobic go fixed
           disabled={isGuest || !firstClick}
           onClick={saveAvailability}
-          className={`z-50 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
+          className={`z-50 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-primary text-white px-4 py-2 rounded-lg hover:primary-hover transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
         >
           Save Availability
         </button>
@@ -140,7 +147,7 @@ export default function AvailabilityGrid({
               backgroundColor: 'rgba(255, 255, 255, 0.25)',
             }}
             key={monthKey}
-            className="mb-8 w-full p-2 sm:p-4 rounded-lg shadow-lg shadow-gray-800"
+            className="mb-24 w-full p-2 sm:p-4 rounded-lg shadow-lg shadow-gray-800"
           >
             <h2 className="text-xl font-bold capitalize">{monthName}</h2>
             <div className="grid grid-cols-7 gap-1 md:gap-2 mt-2 md:mt-4">

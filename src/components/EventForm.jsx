@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { db } from '../firebase'
 import { collection, addDoc } from 'firebase/firestore'
 
-export default function EventForm() {
+export default function EventForm({ mClicked }) {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     eventName: '',
@@ -45,15 +45,19 @@ export default function EventForm() {
 
   return (
     <>
-      <div className="flex items-center justify-center align-middle">
-        <div className="form-group sm:w-100 w-88 items-center border-10 border-blue-400 bg-blue-200 flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl">
+      <div
+        className={`relative ${mClicked ? '-translate-y-5' : 'translate-y-10'}flex items-center justify-center align-middle duration-200 cursor-pointer"`}
+      >
+        <div
+          className={`form-group sm:w-95 w-88 items-center border-10 border-primary bg-secondary text-black flex flex-col p-2 pt-4 rounded-3xl gap-2 transition-all duration-250 ${mClicked ? 'rotate-3' : ''}`}
+        >
           <form onSubmit={handleSubmit}>
             <div className="w-75">
               <label className="font-bold" htmlFor="eventName">
-                Event Name:{' '}
+                Event Name: {mClicked ? 'Clicked!' : 'Not clicked'}
               </label>
               <input
-                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-4 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
+                className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250 bg-white mt-2 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary`}
                 type="text"
                 placeholder="Birthday Party, Conference, etc."
                 id="eventName"
@@ -62,37 +66,43 @@ export default function EventForm() {
                 onChange={handleChange}
                 required
               />
-
-              <label className="font-bold" htmlFor="eventLocation">
-                Location:{' '}
-              </label>
-              <input
-                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-4 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
-                type="text"
-                placeholder="Bill's House, Central Park, etc."
-                id="eventLocation"
-                name="eventLocation"
-                value={formData.eventLocation}
-                onChange={handleChange}
-                required
-              />
-
-              <label className="font-bold" htmlFor="timeRangeDays">
-                Time Range (Days - from now on):{' '}
-              </label>
-              <input
-                className="bg-white mt-2 text-slate-900 p-2 rounded-lg w-full mb-2 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
-                type="text"
-                placeholder="7, 14, etc."
-                id="timeRangeDays"
-                name="timeRangeDays"
-                value={formData.timeRangeDays}
-                onChange={handleChange}
-                required
-              />
+              <div
+                className={`${mClicked ? '-rotate-3' : 'rotate-0'} transition-all duration-250`}
+              >
+                <label className="font-bold" htmlFor="eventLocation">
+                  Location:{' '}
+                </label>
+                <input
+                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-2 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250`}
+                  type="text"
+                  placeholder="Bill's House, Central Park, etc."
+                  id="eventLocation"
+                  name="eventLocation"
+                  value={formData.eventLocation}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div
+                className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250`}
+              >
+                <label className="font-bold" htmlFor="timeRangeDays">
+                  Max Range (Days - from now on):{' '}
+                </label>
+                <input
+                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-2 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary transition-all duration-250`}
+                  type="text"
+                  placeholder="7, 14, etc."
+                  id="timeRangeDays"
+                  name="timeRangeDays"
+                  value={formData.timeRangeDays}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
             <button
-              className="bg-blue-500 text-2xl m-3 text-white cursor-pointer rounded-2xl p-3 hover:bg-blue-600 transition-all duration-250 hover:shadow-sm hover:shadow-blue-950"
+              className={`${mClicked ? '-rotate-6' : 'rotate-0'} bg-primary text-2xl m-3 text-white cursor-pointer rounded-2xl p-3 hover:bg-primary-hover transition-all duration-250 hover:shadow-sm hover:shadow-blue-950`}
               type="submit"
             >
               Create Event
