@@ -10,7 +10,6 @@ export default function NicknameForm({ setNickname, eventId }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Nickname submitted:', inputValue)
 
     setNickname(inputValue)
     localStorage.setItem(`nickname-${eventId}`, inputValue)

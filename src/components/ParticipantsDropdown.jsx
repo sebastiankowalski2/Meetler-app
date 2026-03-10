@@ -21,10 +21,13 @@ export default function ParticipantsDropdown({ participants }) {
           position: 'relative',
           zIndex: 20,
         }}
-        className={`shadow-[0_0_10px_rgba(0,0,255,1),inset_0_0_50px_rgba(255,200,0,1)] border-2 border-blue-500 z-50 text-md font-bold text-black t w-full duration-200 origin-top -mt-4.5 ${isOpen ? 'opacity-100 scale-100 translate-y-4' : 'translate-y-0 opacity-0 scale-95 pointer-events-none'}`}
+        className={`shadow-[0_0_10px_rgba(0,0,255,1),inset_0_0_50px_rgba(255,200,0,1)] border-2 border-blue-500 z-50 text-md font-bold text-black w-full duration-200 origin-top -mt-4.5 ${isOpen ? 'opacity-100 scale-100 translate-y-4' : 'translate-y-0 opacity-0 scale-95 pointer-events-none'}`}
       >
         {participants.map((participant) => (
-          <li className="border border-blue-500" key={participant.nickname}>
+          <li
+            className="py-0.5 border border-blue-500"
+            key={participant.nickname}
+          >
             {participant.nickname.slice(0, 1).toUpperCase() +
               participant.nickname.slice(1).toLowerCase()}
           </li>

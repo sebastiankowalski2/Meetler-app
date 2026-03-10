@@ -1,11 +1,12 @@
 import NicknameForm from '../components/NicknameForm'
 import AvailabilityGrid from '../components/AvailabilityGrid'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 import ParticipantsDropdown from './ParticipantsDropdown'
 import HowItWorks from './HowItWorks'
+import GuestDropdown from './GuestDropdown'
 
 export default function EventView({ eventData, eventId }) {
   const [nickname, setNickname] = useState(
@@ -18,9 +19,7 @@ export default function EventView({ eventData, eventId }) {
 
   useEffect(() => {
     const preloadAvailability = async () => {
-      console.log('first')
       if (!nickname) return
-      console.log('Preloading availability for nickname:', nickname)
       try {
         const participantRef = doc(
           db,
@@ -78,16 +77,29 @@ export default function EventView({ eventData, eventId }) {
 
   const scoreMap = buildScoreMap(participants)
 
+  const dateParticipantsMap = useMemo(() => {
+    const map = {}
+
+    participants.forEach((p) => {
+      Object.entries(p.availability || {}).forEach(([date, value]) => {
+        if (value) {
+          if (!map[date]) map[date] = []
+
+          map[date].push(p.nickname)
+        }
+      })
+    })
+    return map
+  }, [participants])
+
   return (
     <div>
-      <h3 className="text-lg font-bold text-white absolute bg-blue-500 rounded-sm p-1 top-2 left-2">
-        Hi,{' '}
-        {nickname.trim().charAt(0).toUpperCase() +
-          nickname.trim().slice(1).toLowerCase()}
-      </h3>
-
+      <GuestDropdown
+        nickname={nickname}
+        setNickname={setNickname}
+        eventId={eventId}
+      />
       <HowItWorks EventView={true} />
-
       <ParticipantsDropdown participants={participants} />
 
       <div
@@ -97,12 +109,11 @@ export default function EventView({ eventData, eventId }) {
           backgroundColor: 'rgba(255, 255, 255, 0.3)',
           zIndex: 1,
         }}
-        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl  flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-4 md:gap-20 lg:gap-30"
+        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl  flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-20 md:gap-20 lg:gap-30 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
       >
         <div className="justify-center align-middle items-center mb-5 sm:mb-0">
           <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-blue-500 font-bold">
             Share this link with your friends:<br></br>
-            <span className="text-xs text-white">{window.location.href}</span>
           </h2>
 
           <button
@@ -144,6 +155,7 @@ export default function EventView({ eventData, eventId }) {
         <NicknameForm eventId={eventId} setNickname={setNickname} />
       ) : (
         <AvailabilityGrid
+          dateParticipantsMap={dateParticipantsMap}
           scoreMap={scoreMap}
           participantsCount={participants.length}
           isGuest={isGuest}

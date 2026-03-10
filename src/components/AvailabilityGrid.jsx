@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 
 export default function AvailabilityGrid({
+  dateParticipantsMap,
   scoreMap,
   participantsCount,
   isGuest,
@@ -139,7 +140,7 @@ export default function AvailabilityGrid({
               backgroundColor: 'rgba(255, 255, 255, 0.25)',
             }}
             key={monthKey}
-            className="mb-8 w-full bg-slate-300 p-2 sm:p-4 rounded-lg shadow-lg shadow-gray-800"
+            className="mb-8 w-full p-2 sm:p-4 rounded-lg shadow-lg shadow-gray-800"
           >
             <h2 className="text-xl font-bold capitalize">{monthName}</h2>
             <div className="grid grid-cols-7 gap-1 md:gap-2 mt-2 md:mt-4">
@@ -160,6 +161,7 @@ export default function AvailabilityGrid({
                 ))}
                 {monthDates.map((date, index) => (
                   <CalendarButton
+                    dateParticipantsMap={dateParticipantsMap}
                     scoreMap={scoreMap}
                     maxScore={maxScore}
                     participantsCount={participantsCount}
