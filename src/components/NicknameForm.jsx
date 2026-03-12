@@ -34,7 +34,7 @@ export default function NicknameForm({ setNickname, eventId }) {
           className="absolute inset-0  backdrop-blur-xs z-40"
         ></div>
 
-        <div className="form-group w-90 items-center border-10 border-blue-400 bg-blue-200 flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl relative z-50">
+        <div className="form-group w-90 items-center border-10 border-primary bg-secondary flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl relative z-50">
           <form onSubmit={handleSubmit}>
             <div className="">
               <label className="text-2xl font-semibold" htmlFor="nickname">
@@ -42,7 +42,7 @@ export default function NicknameForm({ setNickname, eventId }) {
               </label>
               <br></br>
               <input
-                className="bg-white mt-5 text-slate-900 p-2 rounded-lg w-60 mb-4 active:outline-blue-500 focus:outline-blue-500 transition-colors duration-250"
+                className="bg-white mt-5 text-slate-900 p-2 rounded-lg w-60 mb-4 active:outline-primary focus:outline-primary transition-colors duration-250"
                 type="text"
                 placeholder="Enter your nickname"
                 id="nickname"
@@ -53,7 +53,7 @@ export default function NicknameForm({ setNickname, eventId }) {
               />
             </div>
             <button
-              className="bg-blue-500 text-lg mt-2 mr-2 mb-3 text-white cursor-pointer rounded-2xl p-2 hover:bg-blue-600 transition-all duration-250 hover:shadow-sm hover:shadow-blue-950 w-32"
+              className="bg-primary text-lg mt-2 mr-2 mb-3 text-white cursor-pointer rounded-2xl p-2 hover:bg-primary-hover transition-all duration-250 hover:shadow-sm hover:shadow-primary-hover w-32"
               type="submit"
             >
               Set Nickname

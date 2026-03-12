@@ -64,7 +64,7 @@ export default function CalendarButton({
         onMouseLeave={() => setHovered(false)}
       >
         <span
-          className={`transition-all duration-200 ${isSelected ? 'bg-primary text-secondary rounded-full px-1 py-0.5' : 'bg-transparent'} ${wrappedDate.getDate() < 10 ? 'px-1.5 sm:px-2 md:px-2.5' : ''} font-bold`}
+          className={`transition-all duration-200 ${isSelected ? 'bg-primary text-white rounded-full px-1 py-0.5' : 'bg-transparent'} ${wrappedDate.getDate() < 10 ? 'px-1.5 sm:px-2 md:px-2.5' : ''} font-bold`}
         >
           {wrappedDate.getDate()}
         </span>

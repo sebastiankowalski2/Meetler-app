@@ -32,6 +32,11 @@ export default function ParticipantsDropdown({ participants }) {
               participant.nickname.slice(1).toLowerCase()}
           </li>
         ))}
+        {participants.length === 0 && (
+          <li className="py-0.5 border border-primary" key="no-participants">
+            No participants
+          </li>
+        )}
       </ul>
     </div>
   )

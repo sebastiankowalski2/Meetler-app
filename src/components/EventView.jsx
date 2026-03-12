@@ -67,13 +67,15 @@ export default function EventView({ eventData, eventId }) {
     })
   }, [participants.length, eventId])
 
+  const today = new Date().toISOString().split('T')[0]
+
   const buildScoreMap = (participants) => {
     const score = {}
 
     participants.forEach((participant) => {
       Object.entries(participant.availability || {}).forEach(
         ([date, value]) => {
-          if (value) {
+          if (value && date >= today) {
             score[date] = (score[date] || 0) + 1
           }
         },
@@ -140,7 +142,6 @@ export default function EventView({ eventData, eventId }) {
             Copy Link
           </button>
         </div>
-
         <div className="px-5 max-w-88 sm:max-w-200 items-center rounded-2xl flex flex-col gap-4">
           <div className="mt-5 justify-center flex align-middle items-center">
             <span className="text-2xl md:text-2xl lg:text-4xl pr-1">🏷️</span>
@@ -165,6 +166,7 @@ export default function EventView({ eventData, eventId }) {
           )}
         </div>
       </div>
+
       {nickname === '' ? (
         <NicknameForm eventId={eventId} setNickname={setNickname} />
       ) : (

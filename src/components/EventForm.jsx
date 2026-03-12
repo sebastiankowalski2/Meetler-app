@@ -2,13 +2,21 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { db } from '../firebase'
 import { collection, addDoc } from 'firebase/firestore'
+import { toast } from 'react-hot-toast'
 
 export default function EventForm({ mClicked }) {
   const navigate = useNavigate()
+
+  const today = new Date().toISOString().split('T')[0]
+  let end = new Date(today)
+  end.setDate(end.getDate() + 7)
+  end = end.toISOString().split('T')[0]
+
   const [formData, setFormData] = useState({
     eventName: '',
     eventLocation: '',
-    timeRangeDays: '',
+    dateStart: today,
+    dateEnd: end,
   })
 
   const handleChange = (e) => {
@@ -21,19 +29,27 @@ export default function EventForm({ mClicked }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
+
+    // Basic validation
+    if (formData.dateEnd < formData.dateStart) {
+      toast.error('End date cannot be before start date.')
+      return
+    }
+    if (formData.dateStart < today || formData.dateEnd < today) {
+      toast.error('Dates cannot be in the past.')
+      return
+    }
 
     try {
       // Add a new document with a generated ID to the "events" collection in Firestore
       const docRef = await addDoc(collection(db, 'events'), formData)
 
-      console.log('Document written with ID: ', docRef.id)
-
       // Reset the form
       setFormData({
         eventName: '',
         eventLocation: '',
-        timeRangeDays: '',
+        dateStart: '',
+        dateEnd: '',
       })
 
       // Navigate to the newly created event page using the generated document ID
@@ -46,7 +62,7 @@ export default function EventForm({ mClicked }) {
   return (
     <>
       <div
-        className={`relative ${mClicked ? '-translate-y-5' : 'translate-y-10'}flex items-center justify-center align-middle duration-200 cursor-pointer"`}
+        className={`relative flex items-center justify-center align-middle duration-200 cursor-pointer"`}
       >
         <div
           className={`form-group sm:w-95 w-88 items-center border-10 border-primary bg-secondary text-black flex flex-col p-2 pt-4 rounded-3xl gap-2 transition-all duration-250 ${mClicked ? 'rotate-3' : ''}`}
@@ -54,10 +70,10 @@ export default function EventForm({ mClicked }) {
           <form onSubmit={handleSubmit}>
             <div className="w-75">
               <label className="font-bold" htmlFor="eventName">
-                Event Name: {mClicked ? 'Clicked!' : 'Not clicked'}
+                Event Name:
               </label>
               <input
-                className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250 bg-white mt-2 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary`}
+                className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250 bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary`}
                 type="text"
                 placeholder="Birthday Party, Conference, etc."
                 id="eventName"
@@ -73,7 +89,7 @@ export default function EventForm({ mClicked }) {
                   Location:{' '}
                 </label>
                 <input
-                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-2 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250`}
+                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250`}
                   type="text"
                   placeholder="Bill's House, Central Park, etc."
                   id="eventLocation"
@@ -86,23 +102,41 @@ export default function EventForm({ mClicked }) {
               <div
                 className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250`}
               >
-                <label className="font-bold" htmlFor="timeRangeDays">
-                  Max Range (Days - from now on):{' '}
+                <label className="font-bold" htmlFor="dateStart">
+                  Start Date:{' '}
                 </label>
                 <input
-                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-2 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary transition-all duration-250`}
-                  type="text"
-                  placeholder="7, 14, etc."
-                  id="timeRangeDays"
-                  name="timeRangeDays"
-                  value={formData.timeRangeDays}
+                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary transition-all duration-250`}
+                  min={today}
+                  type="date"
+                  id="dateStart"
+                  name="dateStart"
+                  value={formData.dateStart}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div
+                className={`${mClicked ? '-rotate-4' : 'rotate-0'} transition-all duration-250`}
+              >
+                <label className="font-bold" htmlFor="dateEnd">
+                  End Date:{' '}
+                </label>
+                <input
+                  className={`${mClicked ? 'rotate-3' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250`}
+                  min={today}
+                  type="date"
+                  id="dateEnd"
+                  name="dateEnd"
+                  value={formData.dateEnd}
                   onChange={handleChange}
                   required
                 />
               </div>
             </div>
             <button
-              className={`${mClicked ? '-rotate-6' : 'rotate-0'} bg-primary text-2xl m-3 text-white cursor-pointer rounded-2xl p-3 hover:bg-primary-hover transition-all duration-250 hover:shadow-sm hover:shadow-blue-950`}
+              className={`${mClicked ? 'rotate-6' : 'rotate-0'} bg-primary text-2xl m-3 text-white cursor-pointer rounded-2xl p-3 hover:bg-primary-hover transition-all duration-250 hover:shadow-sm hover:shadow-blue-950`}
               type="submit"
             >
               Create Event

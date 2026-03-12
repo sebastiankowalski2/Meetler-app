@@ -11,11 +11,11 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="items-center align-middle justify-center flex flex-col mb-4 gap-10">
+    <div className="items-center align-middle justify-center flex flex-col gap-10">
       <div className="relative w-50">
         <img
           onClick={handleMClick}
-          className={`active:scale-95 absolute -left-3.5 w-20 h-auto shadow-2xl shadow-black rounded-full top-5 cursor-pointer`}
+          className={`active:scale-95 absolute -left-3.5 w-20 h-auto shadow-2xl shadow-gray-600 rounded-full top-5 cursor-pointer`}
           src={WebImage}
           alt="Web Image"
         />
@@ -32,10 +32,10 @@ export default function CreateEventPage() {
           backgroundColor: 'rgba(255, 255, 255, 0.3)',
           zIndex: 1,
         }}
-        className="flex flex-col items-center align-middle justify-center  shadow-lg shadow-white/50 px-1.5 sm:px-20 rounded-3xl gap-4 mt-4 pb-4"
+        className="flex flex-col items-center align-middle justify-center shadow-lg shadow-white/50 px-1.5 sm:px-20 rounded-3xl gap-4 mt-2 pb-2 mb-10"
       >
         <h1
-          className={`perspective-[1000px] text-3xl pt-8 font-extrabold mb-3 transition-all duration-1000`}
+          className={`perspective-[1000px] text-3xl pt-4 font-extrabold mb-0 transition-all duration-1000`}
         >
           Create{' '}
           <span

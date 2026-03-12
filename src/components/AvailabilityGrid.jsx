@@ -16,7 +16,29 @@ export default function AvailabilityGrid({
   setSelectedDates,
 }) {
   const [firstClick, setFirstClick] = useState(false)
-  const daysCount = eventData.timeRangeDays
+
+  // zamiana, zamiast timeRangeDays, bedziemy miec po prostu dateStart i dateEnd, zeby moc latwo generowac kalendarz, a nie tylko od dzisiaj do x dni, ale tez np od 1 marca do 30 kwietnia
+  //const dateStart = eventData.dateStart
+  //const dateEnd = eventData.dateEnd
+
+  //const daysCount = Math.ceil((new Date(dateEnd) - new Date(dateStart)) / (1000 * 60 * 60 * 24)) + 1
+
+  //TODO: zrobic walidacje, zeby timeRangeDays bylo liczba dodatnia i mniejsza niz np 365
+  // jak sie niby robi walidacje dat w React? czy to jest po prostu sprawdzanie w handleChange i wyswietlanie errora, albo blokowanie submitu? albo moze uzycie jakiej biblioteki do walidacji formularzy, np Formik czy React Hook Form?
+  // ale react to frontend wiec to nie jest dobre robic w ten sposob?
+  // chyba najlepiej zrobic walidacje w handleSubmit, zeby nie bylo mozliwosci obejscia jej, a w handleChange tylko sprawdzac i wyswietlac errora, zeby user od razu widzial, ze cos jest nie tak, ale i tak mogl kliknac submit i zobaczyc errora, zeby wiedzial co poprawic.
+  const dateStart = eventData.dateStart
+  const dateEnd = eventData.dateEnd
+
+  let daysCount =
+    eventData.timeRangeDays === undefined
+      ? Math.ceil(
+          (new Date(dateEnd) - new Date(dateStart)) / (1000 * 60 * 60 * 24),
+        ) + 1
+      : eventData.timeRangeDays
+
+  daysCount > 365 && (daysCount = 365) // cap at 365 days to prevent performance issues
+  daysCount < 1 && (daysCount = 1) // minimum 1 day
 
   // Generate an array of Date objects starting from today, with the length of daysCount
   const generateDates = (daysCount) => {
@@ -65,7 +87,6 @@ export default function AvailabilityGrid({
   const groupedDates = groupedDatesByMonth(dates)
 
   const toggleDate = (date) => {
-    // Store selection by date string (e.g. 2026-02-26: true/false).
     setSelectedDates((prev) => ({
       ...prev,
       [date]: !prev[date],
@@ -92,8 +113,6 @@ export default function AvailabilityGrid({
         updatedAt: new Date(),
       })
 
-      //TODO: make toast responsive on mobile and desktop.
-
       toast.success('Availability saved successfully!', {
         style: {
           fontStyle: 'extra-bold',
@@ -109,15 +128,13 @@ export default function AvailabilityGrid({
     }
   }
 
-  //co z przypadkiem jak jest pusty scoremap? nie wplywa to zlena wydajnosc?
-
   const scores = Object.values(scoreMap)
   const maxScore = Math.max(...scores, 0)
 
   return (
     <>
       {!isGuest && (
-        <button //zrobic go fixed
+        <button
           disabled={isGuest || !firstClick}
           onClick={saveAvailability}
           className={`z-50 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-primary text-white px-4 py-2 rounded-lg hover:primary-hover transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}

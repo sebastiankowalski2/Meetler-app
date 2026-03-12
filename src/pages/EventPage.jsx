@@ -29,9 +29,6 @@ export default function EventPage() {
   if (!eventData) return <p>Event not found</p>
   return (
     <>
-      {/* <div className="absolute bg-white rounded-4xl p-0.5 top-1 left-1">
-        <h2 className="text-sm">Event ID: {eventId}</h2>
-      </div> */}
       <EventView eventData={eventData} eventId={eventId} />
     </>
   )

@@ -1,24 +1,24 @@
 @import 'tailwindcss';
 
 /* niebieski motyw */
-/* @theme {
+@theme {
   --color-primary: #2b7fff;
   --color-primary-rgb: 43, 127, 255;
-  --color-primary-hover: #333333;
+  --color-primary-hover: #1e5bbf;
 
   --color-secondary: #fcd34d;
   --color-secondary-rgb: 252, 211, 77;
-} */
+}
 
 /* czarny motyw */
-@theme {
+/* @theme {
   --color-primary: #000000;
   --color-primary-rgb: 0, 0, 0;
   --color-primary-hover: #333333;
 
   --color-secondary: #fcd34d;
   --color-secondary-rgb: 252, 211, 77;
-}
+} */
 
 @layer base {
   html {
