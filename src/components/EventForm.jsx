@@ -65,6 +65,10 @@ export default function EventForm({ mClicked }) {
         className={`relative flex items-center justify-center align-middle duration-200 cursor-pointer"`}
       >
         <div
+          style={{
+            backdropFilter: 'blur(20px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+          }}
           className={`form-group sm:w-95 w-88 items-center border-10 border-primary bg-secondary text-black flex flex-col p-2 pt-4 rounded-3xl gap-2 transition-all duration-250 ${mClicked ? 'rotate-3' : ''}`}
         >
           <form onSubmit={handleSubmit}>
@@ -80,6 +84,7 @@ export default function EventForm({ mClicked }) {
                 name="eventName"
                 value={formData.eventName}
                 onChange={handleChange}
+                maxLength={20}
                 required
               />
               <div
@@ -96,6 +101,7 @@ export default function EventForm({ mClicked }) {
                   name="eventLocation"
                   value={formData.eventLocation}
                   onChange={handleChange}
+                  maxLength={20}
                   required
                 />
               </div>
@@ -136,7 +142,7 @@ export default function EventForm({ mClicked }) {
               </div>
             </div>
             <button
-              className={`${mClicked ? 'rotate-6' : 'rotate-0'} bg-primary text-2xl m-3 text-white cursor-pointer rounded-2xl p-3 hover:bg-primary-hover transition-all duration-250 hover:shadow-sm hover:shadow-blue-950`}
+              className={`${mClicked ? 'rotate-6' : 'rotate-0'} bg-primary text-2xl m-3 text-white cursor-pointer rounded-2xl p-2.5 hover:bg-primary-hover transition-all duration-250 hover:shadow-sm hover:shadow-blue-950`}
               type="submit"
             >
               Create Event

@@ -118,7 +118,7 @@ export default function EventView({ eventData, eventId }) {
           backgroundColor: 'rgba(255, 255, 255, 0.3)',
           zIndex: 1,
         }}
-        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl  flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-20 md:gap-20 lg:gap-30 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
+        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-20 lg:gap-20 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
       >
         <div className="justify-center align-middle items-center mb-5 sm:mb-0">
           <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-primary font-bold">
@@ -144,22 +144,22 @@ export default function EventView({ eventData, eventId }) {
         </div>
         <div className="px-5 max-w-88 sm:max-w-200 items-center rounded-2xl flex flex-col gap-4">
           <div className="mt-5 justify-center flex align-middle items-center">
-            <span className="text-2xl md:text-2xl lg:text-4xl pr-1">🏷️</span>
-            <h2 className="text-2xl font-extrabold md:text-2xl lg:text-4xl pr-2 pl-2 text-primary text-shadow-lg inset-shadow-sm shadow-sm ">
+            <span className="text-md md:text-2xl lg:text-4xl pr-1">🏷️</span>
+            <h2 className="text-md font-extrabold md:text-2xl lg:text-2xl pr-2 pl-2 text-primary inset-shadow-sm shadow-sm">
               {eventData.eventName.toUpperCase()}
             </h2>
-            <span className="text-2xl md:text-2xl lg:text-4xl pl-1">🏷️</span>
+            <span className="text-md md:text-2xl lg:text-4xl pl-1">🏷️</span>
           </div>
 
           {eventData.eventLocation && (
             <div className="mb-1 justify-center flex align-middle items-center">
-              <span className="text-xl md:text-xl lg:text-2xl pb-2 pr-1">
+              <span className="text-md md:text-xl lg:text-2xl pb-2 pr-1">
                 🗺️
               </span>
-              <h2 className="text-xl md:text-xl lg:text-2xl mb-4 mt-2 pr-2 pl-2 text-yellow-300 text-shadow-lg inset-shadow-sm shadow-sm font-bold">
+              <h2 className="text-md md:text-xl lg:text-xl mb-4 mt-2 pr-2 pl-2 text-secondary bg-primary inset-shadow-sm shadow-sm font-bold">
                 {eventData.eventLocation.toUpperCase()}
               </h2>
-              <span className="text-xl md:text-xl lg:text-2xl pb-2 pl-1">
+              <span className="text-md md:text-xl lg:text-2xl pb-2 pl-1">
                 🗺️
               </span>
             </div>

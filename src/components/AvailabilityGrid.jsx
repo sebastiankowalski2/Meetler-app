@@ -164,7 +164,7 @@ export default function AvailabilityGrid({
               backgroundColor: 'rgba(255, 255, 255, 0.25)',
             }}
             key={monthKey}
-            className="mb-24 w-full p-2 sm:p-4 rounded-lg shadow-lg shadow-gray-800"
+            className="sm:mb-10 mb-6 w-full p-2 sm:p-4 rounded-lg shadow-lg shadow-gray-800"
           >
             <h2 className="text-xl font-bold capitalize">{monthName}</h2>
             <div className="grid grid-cols-7 gap-1 md:gap-2 mt-2 md:mt-4">

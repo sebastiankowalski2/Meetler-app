@@ -34,7 +34,13 @@ export default function NicknameForm({ setNickname, eventId }) {
           className="absolute inset-0  backdrop-blur-xs z-40"
         ></div>
 
-        <div className="form-group w-90 items-center border-10 border-primary bg-secondary flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl relative z-50">
+        <div
+          style={{
+            backdropFilter: 'blur(20px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+          }}
+          className="form-group w-90 items-center border-10 border-primary bg-transparent flex flex-col p-2 pt-4 rounded-3xl gap-2 bos-shadow-lg shadow-blue-950 shadow-2xl relative z-50"
+        >
           <form onSubmit={handleSubmit}>
             <div className="">
               <label className="text-2xl font-semibold" htmlFor="nickname">
@@ -49,6 +55,7 @@ export default function NicknameForm({ setNickname, eventId }) {
                 name="nickname"
                 value={inputValue}
                 onChange={handleChange}
+                maxLength={20}
                 required
               />
             </div>

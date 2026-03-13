@@ -10,6 +10,7 @@
 @media (min-width: 464px) {
   #root {
     padding: 0 2rem 0.5rem 2rem;
+    padding-bottom: 4rem;
   }
 }
 
@@ -20,6 +21,9 @@
     padding-left: 2px;
     right: 1px;
     bottom: 1px;
+  }
+  #root {
+    padding-bottom: 4rem;
   }
 }
 
