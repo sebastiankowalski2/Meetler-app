@@ -4,6 +4,13 @@
 
 https://meetler.web.app
 
+Meetler is a modern, intuitive web app to easily coordinate group events. Wondering how it works?
+
+1. Create an event and select a date range
+2. Pick the days that suit you
+3. Share the link with friends
+4. See common available days highlighted
+
 A modern, intuitive web application for coordinating event availability with friends and colleagues. Meetler simplifies the process of finding the best time for everyone to meet by allowing participants to mark their availability on an interactive calendar.
 
 ## 🖼️ Preview
@@ -12,15 +19,18 @@ A modern, intuitive web application for coordinating event availability with fri
 
 ## ✨ Features
 
-- **Event Creation** - Easily create events with name, location, and time range
-- **Interactive Calendar Grid** - Visual availability selection with color-coded indicators
-- **Real-time Scoring** - See which dates are most popular among participants
-- **Guest Support** - Share events with guests who can view but not modify availability
+- **Event Creation** - Create events with name, location and start date + end date to set the Range of the meeting
+- **Validation for Date Inputs** - Prevents selecting past dates and invalid ranges
+- **Interactive Availability Grid** - Toggle available dates and save to Firestore
+- **Real-time Participants Sync** - Live updates using Firestore `onSnapshot`
+- **Availability Persistence** - Previously saved availability auto-loads after name set
+- **Participant Insights** - See participants names and participants count, names per date, and per-day score badges
 - **Smart Date Highlighting** -
-  - Red border: All participants available
-  - Yellow/Orange border: Almost everyone available
-- **One-Click Link Sharing** - Copy shareable links to distribute to participants
-- **Responsive Design** - Works seamlessly on desktop, tablet, and mobile devices
+  - Red glow: Everyone is available on that date
+  - Orange glow: Best alternative date
+- **Guest Mode** - View-only access without editing
+- **Quick Share Link** - Copy the event URL in one click
+- **Responsive Layout** - Optimized for desktop, tablet, and mobile
 
 ## 🛠️ Tech Stack
 
@@ -36,7 +46,7 @@ A modern, intuitive web application for coordinating event availability with fri
 
 Before you begin, ensure you have the following installed:
 
-- Node.js (v16 or higher)
+- Node.js (v20 or higher)
 - npm or yarn
 
 ## 🚀 Getting Started
@@ -95,7 +105,8 @@ Before you begin, ensure you have the following installed:
 2. Fill in the event details:
    - **Event Name**: Enter the name of your event
    - **Location**: Specify where the event will take place
-   - **Time Range**: Enter the number of days from today to include in the calendar
+   - **Start Date**: Choose when availability tracking starts
+   - **End Date**: Choose when availability tracking ends
 3. Click "Create Event"
 4. Share the generated link with participants
 
@@ -105,13 +116,16 @@ Before you begin, ensure you have the following installed:
 2. Click on dates in the calendar to mark your availability
 3. Selected dates will turn blue
 4. Click "Save Availability" to record your choices
+5. Return later to auto-load your saved availability
 
 ### Reading the Calendar
 
 - **Grey dates**: Not selected by you
 - **Blue dates**: Selected by you
-- **Red border**: All participants are available
-- **Yellow/Orange border**: Almost everyone is available
+- **Score badge (number)**: How many participants are available on that date
+- **Red glow**: All participants are available
+- **Orange glow**: Best alternative date
+- **Hover tooltip**: Shows nicknames of available participants for a date
 
 ## 📁 Project Structure
 
@@ -123,7 +137,10 @@ Meetler/
 │   │   ├── CalendarButton.jsx        # Individual date button
 │   │   ├── EventForm.jsx             # Event creation form
 │   │   ├── EventView.jsx             # Main event view
-│   │   └── NicknameForm.jsx          # Nickname/participant form
+│   │   ├── GuestDropdown.jsx         # Current user menu + logout
+│   │   ├── HowItWorks.jsx            # Usage/help panel
+│   │   ├── NicknameForm.jsx          # Nickname/guest form
+│   │   └── ParticipantsDropdown.jsx  # Participants list dropdown
 │   ├── pages/
 │   │   ├── CreateEventPage.jsx       # Event creation page
 │   │   └── EventPage.jsx             # Event detail page
