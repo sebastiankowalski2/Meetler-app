@@ -121,6 +121,16 @@ export default function AvailabilityGrid({
   const scores = Object.values(scoreMap)
   const maxScore = Math.max(...scores, 0)
 
+  // const maxScore2 = Math.max(
+  //   ...Object.values(dateParticipantsMap || {}).map((arr) => arr.length),
+  //   0,
+  //   console.log('dateParticipantsMap:', dateParticipantsMap),
+  //   console.log(scoreMap, 'scoreMap'),
+  //   console.log('maxScore:', maxScore),
+  // )
+
+  //TODO: ogarnac zeby brac wszystko z dateParticipantsMap nie musimy korzystac z scoreMap, mozemy uzyc juz obliczonego dateParticipantsMap, bo scoreMap jest tylko iloscia uczestnikow, a dateParticipantsMap zawiera ich nicki, wiec mozemy sprawdzic dlugosc tablicy z nickami dla kazdego dnia i znalezc maxa
+
   return (
     <>
       {!isGuest && (

@@ -1,7 +1,7 @@
 import NicknameForm from '../components/NicknameForm'
 import AvailabilityGrid from '../components/AvailabilityGrid'
 import { useState, useEffect, useMemo } from 'react'
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
+import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 import ParticipantsDropdown from './ParticipantsDropdown'
@@ -18,8 +18,10 @@ export default function EventView({ eventData, eventId }) {
   const isGuest = nickname === 'Guest'
 
   useEffect(() => {
+    let cancelled = false
     const preloadAvailability = async () => {
       if (!nickname) return
+
       try {
         const participantRef = doc(
           db,
@@ -30,6 +32,8 @@ export default function EventView({ eventData, eventId }) {
         )
 
         const snapshot = await getDoc(participantRef)
+
+        if (cancelled) return
 
         if (snapshot.exists()) {
           const data = snapshot.data()
@@ -46,59 +50,57 @@ export default function EventView({ eventData, eventId }) {
           setSelectedDates({})
         }
       } catch (error) {
-        toast.error('Failed to load availability.')
-        console.error(error)
+        if (!cancelled) {
+          console.log('Failed to preload availability:', error)
+          toast.error('Could not to load previous availability')
+          setSelectedDates({})
+        }
       }
     }
 
     preloadAvailability()
+
+    return () => {
+      cancelled = true
+    }
   }, [nickname, eventId])
 
+  //realtime fetch
   useEffect(() => {
-    const fetchParticipants = async () => {
-      const participantsRef = collection(db, 'events', eventId, 'participants')
-      const snapshot = await getDocs(participantsRef)
-      const participants = snapshot.docs.map((doc) => doc.data())
-      setParticipants(participants)
+    const participantsRef = collection(db, 'events', eventId, 'participants')
+
+    let unsubscribe = () => {}
+
+    try {
+      unsubscribe = onSnapshot(participantsRef, (snapshot) => {
+        const participants = snapshot.docs.map((doc) => doc.data())
+        setParticipants(participants)
+      })
+    } catch (error) {
+      console.log('Failed to subscribe to participants:', error)
+      toast.error('Could not start realtime updates for participants')
     }
+    return () => unsubscribe()
+  }, [eventId])
 
-    fetchParticipants().catch((error) => {
-      console.error('Error fetching participants:', error)
-    })
-  }, [participants.length, eventId])
-
-  const today = new Date().toISOString().split('T')[0]
-
-  const buildScoreMap = (participants) => {
+  const { scoreMap, dateParticipantsMap } = useMemo(() => {
+    const today = new Date().toISOString().split('T')[0]
     const score = {}
-
-    participants.forEach((participant) => {
-      Object.entries(participant.availability || {}).forEach(
-        ([date, value]) => {
-          if (value && date >= today) {
-            score[date] = (score[date] || 0) + 1
-          }
-        },
-      )
-    })
-    return score
-  }
-
-  const scoreMap = buildScoreMap(participants)
-
-  const dateParticipantsMap = useMemo(() => {
     const map = {}
 
     participants.forEach((p) => {
       Object.entries(p.availability || {}).forEach(([date, value]) => {
         if (value) {
+          if (date >= today) {
+            score[date] = (score[date] || 0) + 1
+          }
           if (!map[date]) map[date] = []
-
           map[date].push(p.nickname)
         }
       })
     })
-    return map
+
+    return { scoreMap: score, dateParticipantsMap: map }
   }, [participants])
 
   return (
