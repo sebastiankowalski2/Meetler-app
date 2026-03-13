@@ -8,7 +8,7 @@ A modern, intuitive web application for coordinating event availability with fri
 
 ## 🖼️ Preview
 
-![Meetler Screenshot](https://i.imgur.com/SoyER2f.png)
+![Meetler Screenshot](https://i.imgur.com/9hoRumo.png)
 
 ## ✨ Features
 
