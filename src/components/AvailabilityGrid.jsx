@@ -17,16 +17,6 @@ export default function AvailabilityGrid({
 }) {
   const [firstClick, setFirstClick] = useState(false)
 
-  // zamiana, zamiast timeRangeDays, bedziemy miec po prostu dateStart i dateEnd, zeby moc latwo generowac kalendarz, a nie tylko od dzisiaj do x dni, ale tez np od 1 marca do 30 kwietnia
-  //const dateStart = eventData.dateStart
-  //const dateEnd = eventData.dateEnd
-
-  //const daysCount = Math.ceil((new Date(dateEnd) - new Date(dateStart)) / (1000 * 60 * 60 * 24)) + 1
-
-  //TODO: zrobic walidacje, zeby timeRangeDays bylo liczba dodatnia i mniejsza niz np 365
-  // jak sie niby robi walidacje dat w React? czy to jest po prostu sprawdzanie w handleChange i wyswietlanie errora, albo blokowanie submitu? albo moze uzycie jakiej biblioteki do walidacji formularzy, np Formik czy React Hook Form?
-  // ale react to frontend wiec to nie jest dobre robic w ten sposob?
-  // chyba najlepiej zrobic walidacje w handleSubmit, zeby nie bylo mozliwosci obejscia jej, a w handleChange tylko sprawdzac i wyswietlac errora, zeby user od razu widzial, ze cos jest nie tak, ale i tak mogl kliknac submit i zobaczyc errora, zeby wiedzial co poprawic.
   const dateStart = eventData.dateStart
   const dateEnd = eventData.dateEnd
 
@@ -37,8 +27,8 @@ export default function AvailabilityGrid({
         ) + 1
       : eventData.timeRangeDays
 
-  daysCount > 365 && (daysCount = 365) // cap at 365 days to prevent performance issues
-  daysCount < 1 && (daysCount = 1) // minimum 1 day
+  daysCount > 365 && (daysCount = 365)
+  daysCount < 1 && (daysCount = 1)
 
   // Generate an array of Date objects starting from today, with the length of daysCount
   const generateDates = (daysCount) => {

@@ -118,7 +118,7 @@ export default function EventView({ eventData, eventId }) {
           backgroundColor: 'rgba(255, 255, 255, 0.3)',
           zIndex: 1,
         }}
-        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-20 lg:gap-20 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
+        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-20 lg:gap-25 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
       >
         <div className="justify-center align-middle items-center mb-5 sm:mb-0">
           <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-primary font-bold">

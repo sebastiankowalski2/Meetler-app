@@ -62,7 +62,7 @@ export default function EventForm({ mClicked }) {
   return (
     <>
       <div
-        className={`relative flex items-center justify-center align-middle duration-200 cursor-pointer`}
+        className={`relative flex items-center justify-center align-middle duration-200`}
       >
         <div
           style={{
@@ -77,7 +77,7 @@ export default function EventForm({ mClicked }) {
                 Event Name:
               </label>
               <input
-                className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250 bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary`}
+                className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250 bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary cursor-pointer`}
                 type="text"
                 placeholder="Birthday Party, Conference, etc."
                 id="eventName"
@@ -94,7 +94,7 @@ export default function EventForm({ mClicked }) {
                   Location:{' '}
                 </label>
                 <input
-                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250`}
+                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
                   type="text"
                   placeholder="Bill's House, Central Park, etc."
                   id="eventLocation"
@@ -112,7 +112,7 @@ export default function EventForm({ mClicked }) {
                   Start Date:{' '}
                 </label>
                 <input
-                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary transition-all duration-250`}
+                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
                   min={today}
                   type="date"
                   id="dateStart"
@@ -130,7 +130,7 @@ export default function EventForm({ mClicked }) {
                   End Date:{' '}
                 </label>
                 <input
-                  className={`${mClicked ? 'rotate-3' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250`}
+                  className={`${mClicked ? 'rotate-3' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
                   min={today}
                   type="date"
                   id="dateEnd"
