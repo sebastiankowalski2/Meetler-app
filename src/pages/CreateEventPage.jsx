@@ -11,7 +11,7 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="items-center align-middle justify-center flex flex-col gap-10">
+    <div className="items-center align-middle justify-center flex flex-col gap-10 eventFormStyle">
       <div className="relative w-50">
         <img
           onClick={handleMClick}

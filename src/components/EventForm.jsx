@@ -62,7 +62,7 @@ export default function EventForm({ mClicked }) {
   return (
     <>
       <div
-        className={`relative flex items-center justify-center align-middle duration-200 cursor-pointer"`}
+        className={`relative flex items-center justify-center align-middle duration-200 cursor-pointer`}
       >
         <div
           style={{

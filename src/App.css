@@ -10,11 +10,33 @@
 @media (min-width: 464px) {
   #root {
     padding: 0 2rem 0.5rem 2rem;
+  }
+
+  .availabilityGrid {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    margin-bottom: 4rem;
+  }
+}
+
+@media (min-width: 464px) and (max-width: 640px) {
+  #root {
     padding-bottom: 4rem;
+  }
+
+  .dateCalendarButton {
+    height: 48px;
+  }
+
+  .availabilityGrid {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
   }
 }
 
 @media (max-width: 640px) {
+  /* markcount */
   .btn {
     font-size: 10px;
     padding-right: 2px;
