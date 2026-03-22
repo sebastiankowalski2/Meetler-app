@@ -12,7 +12,7 @@ export default function ParticipantsDropdown({ participants }) {
     <div className="absolute top-2 right-2 flex flex-col items-end">
       <button className="z-21 relative" onClick={() => setIsOpen(!isOpen)}>
         <h3 className="text-lg font-bold text-white bg-primary rounded-sm p-1 cursor-pointer">
-          {isMobile ? '👤' : 'Participants:'}{' '}
+          {isMobile ? '🧑' : 'Participants:'}{' '}
           <span className="bg-amber-300 text-black font-bold px-2 rounded-full">
             {participants.length}
           </span>

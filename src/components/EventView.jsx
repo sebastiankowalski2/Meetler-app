@@ -84,24 +84,54 @@ export default function EventView({ eventData, eventId }) {
   }, [eventId])
 
   const { scoreMap, dateParticipantsMap } = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const parseDateString = (dateString) => {
+      const [year, month, day] = dateString.split('-').map(Number)
+      return new Date(year, month - 1, day)
+    }
+
     const score = {}
     const map = {}
+
+    const hasDateRange =
+      eventData?.timeRangeDays === undefined &&
+      eventData?.dateStart &&
+      eventData?.dateEnd
+
+    const eventStartDate = hasDateRange
+      ? parseDateString(eventData.dateStart)
+      : null
+    const eventEndDate = hasDateRange
+      ? parseDateString(eventData.dateEnd)
+      : null
+    const effectiveStartDate =
+      hasDateRange && eventStartDate < today ? today : eventStartDate
 
     participants.forEach((p) => {
       Object.entries(p.availability || {}).forEach(([date, value]) => {
         if (value) {
-          if (date >= today) {
-            score[date] = (score[date] || 0) + 1
-          }
+          const dateObj = parseDateString(date)
+
+          if (Number.isNaN(dateObj.getTime())) return
+
+          const isInVisibleRange = hasDateRange
+            ? dateObj >= effectiveStartDate && dateObj <= eventEndDate
+            : dateObj >= today
+
+          if (!isInVisibleRange) return
+
+          score[date] = (score[date] || 0) + 1
           if (!map[date]) map[date] = []
           map[date].push(p.nickname)
         }
       })
     })
-
+    console.log('scoreMap:', score)
+    console.log('dateParticipantsMap:', map)
     return { scoreMap: score, dateParticipantsMap: map }
-  }, [participants])
+  }, [participants, eventData])
 
   return (
     <div>

@@ -17,29 +17,42 @@ export default function AvailabilityGrid({
 }) {
   const [firstClick, setFirstClick] = useState(false)
 
+  // Parse YYYY-MM-DD into a local Date to avoid timezone shifts.
+  const parseDateString = (dateString) => {
+    const [year, month, day] = dateString.split('-').map(Number)
+    return new Date(year, month - 1, day)
+  }
+
   const dateStart = eventData.dateStart
   const dateEnd = eventData.dateEnd
+  const usesDateRange =
+    eventData.timeRangeDays === undefined && dateStart && dateEnd
 
-  let daysCount =
-    eventData.timeRangeDays === undefined
-      ? Math.ceil(
-          (new Date(dateEnd) - new Date(dateStart)) / (1000 * 60 * 60 * 24),
-        ) + 1
-      : eventData.timeRangeDays
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const eventStartDate = usesDateRange ? parseDateString(dateStart) : null
+  const eventEndDate = usesDateRange ? parseDateString(dateEnd) : null
+  const effectiveStartDate =
+    usesDateRange && eventStartDate < today ? today : eventStartDate
+
+  let daysCount = usesDateRange
+    ? Math.ceil((eventEndDate - effectiveStartDate) / (1000 * 60 * 60 * 24)) + 1
+    : eventData.timeRangeDays
 
   daysCount > 365 && (daysCount = 365)
   daysCount < 1 && (daysCount = 1)
 
-  // Generate an array of Date objects starting from today, with the length of daysCount
-  const generateDates = (daysCount) => {
+  // Generate dates from explicit event range, fallback to legacy "today + N days" mode.
+  const generateDates = (daysCount, startDate) => {
     const dates = []
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const baseDate = startDate ? new Date(startDate) : new Date()
+    baseDate.setHours(0, 0, 0, 0)
 
     //tu ewenualnie <= zeby bylo +1 dzien
     for (let i = 0; i < daysCount; i++) {
-      const date = new Date(today)
-      date.setDate(today.getDate() + i)
+      const date = new Date(baseDate)
+      date.setDate(baseDate.getDate() + i)
 
       const year = date.getFullYear()
       const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -50,13 +63,10 @@ export default function AvailabilityGrid({
     return dates
   }
 
-  const dates = generateDates(daysCount)
-
-  // Parse YYYY-MM-DD into a local Date to avoid timezone shifts.
-  const parseDateString = (dateString) => {
-    const [year, month, day] = dateString.split('-').map(Number)
-    return new Date(year, month - 1, day)
-  }
+  const dates = generateDates(
+    daysCount,
+    usesDateRange ? effectiveStartDate : null,
+  )
 
   // Group by month while keeping date strings as keys for readable state.
   const groupedDatesByMonth = (dates) => {
