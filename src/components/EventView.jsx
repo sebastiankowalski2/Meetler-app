@@ -18,6 +18,17 @@ export default function EventView({ eventData, eventId }) {
   const isGuest = nickname === 'Guest'
 
   useEffect(() => {
+    if (!eventData?.eventName) return
+
+    const previousTitle = document.title
+    document.title = `Meetler | ${eventData.eventName}`
+
+    return () => {
+      document.title = previousTitle
+    }
+  }, [eventData?.eventName])
+
+  useEffect(() => {
     let cancelled = false
     const preloadAvailability = async () => {
       if (!nickname) return
@@ -28,7 +39,7 @@ export default function EventView({ eventData, eventId }) {
           'events',
           eventId,
           'participants',
-          nickname.toLowerCase().trim(), //jak cos nie bedzie dzialac to
+          nickname.toLowerCase().trim(),
         )
 
         const snapshot = await getDoc(participantRef)
@@ -128,8 +139,6 @@ export default function EventView({ eventData, eventId }) {
         }
       })
     })
-    console.log('scoreMap:', score)
-    console.log('dateParticipantsMap:', map)
     return { scoreMap: score, dateParticipantsMap: map }
   }, [participants, eventData])
 

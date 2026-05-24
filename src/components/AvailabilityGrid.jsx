@@ -49,7 +49,7 @@ export default function AvailabilityGrid({
     const baseDate = startDate ? new Date(startDate) : new Date()
     baseDate.setHours(0, 0, 0, 0)
 
-    //tu ewenualnie <= zeby bylo +1 dzien
+    // Tu ewenualnie <= zeby bylo +1 dzien
     for (let i = 0; i < daysCount; i++) {
       const date = new Date(baseDate)
       date.setDate(baseDate.getDate() + i)
@@ -94,7 +94,6 @@ export default function AvailabilityGrid({
     setFirstClick(true)
   }
 
-  //TODO w przyszlosci przerzucic do EventView
   const saveAvailability = async () => {
     if (!nickname || nickname === 'Guest') return
 
@@ -130,16 +129,6 @@ export default function AvailabilityGrid({
 
   const scores = Object.values(scoreMap)
   const maxScore = Math.max(...scores, 0)
-
-  // const maxScore2 = Math.max(
-  //   ...Object.values(dateParticipantsMap || {}).map((arr) => arr.length),
-  //   0,
-  //   console.log('dateParticipantsMap:', dateParticipantsMap),
-  //   console.log(scoreMap, 'scoreMap'),
-  //   console.log('maxScore:', maxScore),
-  // )
-
-  //TODO: ogarnac zeby brac wszystko z dateParticipantsMap nie musimy korzystac z scoreMap, mozemy uzyc juz obliczonego dateParticipantsMap, bo scoreMap jest tylko iloscia uczestnikow, a dateParticipantsMap zawiera ich nicki, wiec mozemy sprawdzic dlugosc tablicy z nickami dla kazdego dnia i znalezc maxa
 
   return (
     <>
