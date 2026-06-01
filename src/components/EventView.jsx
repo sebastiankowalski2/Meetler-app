@@ -21,7 +21,7 @@ export default function EventView({ eventData, eventId }) {
     if (!eventData?.eventName) return
 
     const previousTitle = document.title
-    document.title = `Meetler | ${eventData.eventName}`
+    document.title = `${eventData.eventName} - Meetler`
 
     return () => {
       document.title = previousTitle
