@@ -144,7 +144,7 @@ export default function AvailabilityGrid({
         </p>
       ) : isGuest ? (
         <div className="mb-6">
-          <LoginRequired message="Aby zaznaczyć swoją dostępność, zaloguj się przez Google. Możesz na razie przeglądać kalendarz." />
+          <LoginRequired message="To indicate your availability, log in via Google. You can browse the calendar for now." />
         </div>
       ) : (
         <button

@@ -9,9 +9,17 @@ import { useAuth } from '../context/useAuth'
 // `showEditName`: exposes an inline editor for the *display name* only.
 // This never changes the account/uid - it's purely presentational, wired
 // through AuthContext.updateDisplayName.
-export default function AuthControls({ compact = false, showEditName = false }) {
-  const { user, authLoading, signInWithGoogle, signOutUser, updateDisplayName } =
-    useAuth()
+export default function AuthControls({
+  compact = false,
+  showEditName = false,
+}) {
+  const {
+    user,
+    authLoading,
+    signInWithGoogle,
+    signOutUser,
+    updateDisplayName,
+  } = useAuth()
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
 
