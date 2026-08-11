@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { db } from '../firebase'
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { toast } from 'react-hot-toast'
+import { useAuth } from '../context/useAuth'
 
 export default function EventForm({ mClicked }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const today = new Date().toISOString().split('T')[0]
   let end = new Date(today)
@@ -42,7 +44,12 @@ export default function EventForm({ mClicked }) {
 
     try {
       // Add a new document with a generated ID to the "events" collection in Firestore
-      const docRef = await addDoc(collection(db, 'events'), formData)
+      const docRef = await addDoc(collection(db, 'events'), {
+        ...formData,
+        createdBy: user ? user.uid : null,
+        createdByName: user ? user.displayName || user.email : null,
+        createdAt: serverTimestamp(),
+      })
 
       // Reset the form
       setFormData({

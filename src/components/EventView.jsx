@@ -1,4 +1,3 @@
-import NicknameForm from '../components/NicknameForm'
 import AvailabilityGrid from '../components/AvailabilityGrid'
 import { useState, useEffect, useMemo } from 'react'
 import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore'
@@ -6,16 +5,17 @@ import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 import ParticipantsDropdown from './ParticipantsDropdown'
 import HowItWorks from './HowItWorks'
-import GuestDropdown from './GuestDropdown'
+import UserMenu from './UserMenu'
+import { useAuth } from '../context/useAuth'
 
 export default function EventView({ eventData, eventId }) {
-  const [nickname, setNickname] = useState(
-    localStorage.getItem(`nickname-${eventId}`) || '',
-  )
+  const { user, authLoading } = useAuth()
   const [selectedDates, setSelectedDates] = useState({})
   const [participants, setParticipants] = useState([])
 
-  const isGuest = nickname === 'Guest'
+  // A signed-out visitor can only view the event - editing availability is
+  // a protected, per-user action and requires a Google account.
+  const isGuest = !user
 
   useEffect(() => {
     if (!eventData?.eventName) return
@@ -28,10 +28,15 @@ export default function EventView({ eventData, eventId }) {
     }
   }, [eventData?.eventName])
 
+  // Preload this user's previously saved availability, keyed by their
+  // stable Firebase uid (never by a self-reported name).
   useEffect(() => {
     let cancelled = false
     const preloadAvailability = async () => {
-      if (!nickname) return
+      if (!user) {
+        setSelectedDates({})
+        return
+      }
 
       try {
         const participantRef = doc(
@@ -39,7 +44,7 @@ export default function EventView({ eventData, eventId }) {
           'events',
           eventId,
           'participants',
-          nickname.toLowerCase().trim(),
+          user.uid,
         )
 
         const snapshot = await getDoc(participantRef)
@@ -74,7 +79,7 @@ export default function EventView({ eventData, eventId }) {
     return () => {
       cancelled = true
     }
-  }, [nickname, eventId])
+  }, [user, eventId])
 
   //realtime fetch
   useEffect(() => {
@@ -135,7 +140,7 @@ export default function EventView({ eventData, eventId }) {
 
           score[date] = (score[date] || 0) + 1
           if (!map[date]) map[date] = []
-          map[date].push(p.nickname)
+          map[date].push(p.displayName || 'Anonymous')
         }
       })
     })
@@ -144,11 +149,7 @@ export default function EventView({ eventData, eventId }) {
 
   return (
     <div>
-      <GuestDropdown
-        nickname={nickname}
-        setNickname={setNickname}
-        eventId={eventId}
-      />
+      <UserMenu />
       <HowItWorks EventView={true} />
       <ParticipantsDropdown participants={participants} />
 
@@ -208,21 +209,17 @@ export default function EventView({ eventData, eventId }) {
         </div>
       </div>
 
-      {nickname === '' ? (
-        <NicknameForm eventId={eventId} setNickname={setNickname} />
-      ) : (
-        <AvailabilityGrid
-          dateParticipantsMap={dateParticipantsMap}
-          scoreMap={scoreMap}
-          participantsCount={participants.length}
-          isGuest={isGuest}
-          eventData={eventData}
-          eventId={eventId}
-          nickname={nickname}
-          selectedDates={selectedDates}
-          setSelectedDates={setSelectedDates}
-        />
-      )}
+      <AvailabilityGrid
+        dateParticipantsMap={dateParticipantsMap}
+        scoreMap={scoreMap}
+        participantsCount={participants.length}
+        isGuest={isGuest}
+        authLoading={authLoading}
+        eventData={eventData}
+        eventId={eventId}
+        selectedDates={selectedDates}
+        setSelectedDates={setSelectedDates}
+      />
     </div>
   )
 }

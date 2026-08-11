@@ -3,6 +3,8 @@ import { doc, setDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 import { useState } from 'react'
+import { useAuth } from '../context/useAuth'
+import LoginRequired from './LoginRequired'
 
 export default function AvailabilityGrid({
   dateParticipantsMap,
@@ -11,11 +13,11 @@ export default function AvailabilityGrid({
   isGuest,
   eventData,
   eventId,
-  nickname,
   selectedDates,
   setSelectedDates,
 }) {
   const [firstClick, setFirstClick] = useState(false)
+  const { user, authLoading } = useAuth()
 
   // Parse YYYY-MM-DD into a local Date to avoid timezone shifts.
   const parseDateString = (dateString) => {
@@ -95,7 +97,7 @@ export default function AvailabilityGrid({
   }
 
   const saveAvailability = async () => {
-    if (!nickname || nickname === 'Guest') return
+    if (!user) return
 
     try {
       const participantRef = doc(
@@ -103,11 +105,12 @@ export default function AvailabilityGrid({
         'events',
         eventId,
         'participants',
-        nickname.trim().toLowerCase(),
+        user.uid,
       )
 
       await setDoc(participantRef, {
-        nickname: nickname.trim().toLowerCase(),
+        uid: user.uid,
+        displayName: user.displayName || user.email || 'Anonymous',
         availability: selectedDates,
         updatedAt: new Date(),
       })
@@ -132,9 +135,15 @@ export default function AvailabilityGrid({
 
   return (
     <>
-      {!isGuest && (
+      {authLoading ? (
+        <p className="mb-4 font-bold opacity-70">Checking your session…</p>
+      ) : isGuest ? (
+        <div className="mb-6">
+          <LoginRequired message="Aby zaznaczyć swoją dostępność, zaloguj się przez Google. Możesz na razie przeglądać kalendarz." />
+        </div>
+      ) : (
         <button
-          disabled={isGuest || !firstClick}
+          disabled={!firstClick}
           onClick={saveAvailability}
           className={`z-50 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-primary text-white px-4 py-2 rounded-lg hover:primary-hover transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
         >

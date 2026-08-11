@@ -29,12 +29,8 @@ export default function ParticipantsDropdown({ participants }) {
         className={`shadow-[0_0_10px_rgb(var(--color-primary-rgb)),inset_0_0_40px_rgb(var(--color-secondary-rgb))] border-2 border-primary z-50 text-md font-bold text-black w-full duration-200 origin-top -mt-4.5 ${isOpen ? 'opacity-100 scale-100 translate-y-4' : 'translate-y-0 opacity-0 scale-95 pointer-events-none'}`}
       >
         {participants.map((participant) => (
-          <li
-            className="py-0.5 border border-primary"
-            key={participant.nickname}
-          >
-            {participant.nickname.slice(0, 1).toUpperCase() +
-              participant.nickname.slice(1).toLowerCase()}
+          <li className="py-0.5 border border-primary" key={participant.uid}>
+            {participant.displayName || 'Anonymous'}
           </li>
         ))}
         {participants.length === 0 && (

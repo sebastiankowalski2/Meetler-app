@@ -1,5 +1,6 @@
 import EventForm from '../components/EventForm'
 import HowItWorks from '../components/HowItWorks'
+import AuthControls from '../components/AuthControls'
 import WebImage from '../assets/web.png'
 import { useState } from 'react'
 
@@ -12,6 +13,9 @@ export default function CreateEventPage() {
 
   return (
     <div className="items-center align-middle justify-center flex flex-col gap-10 eventFormStyle">
+      <div className="absolute top-2 right-2 z-20">
+        <AuthControls />
+      </div>
       <div className="relative w-50">
         <img
           onClick={handleMClick}
