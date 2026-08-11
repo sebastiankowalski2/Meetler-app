@@ -3,19 +3,25 @@ import { useState, useEffect, useMemo } from 'react'
 import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 import ParticipantsDropdown from './ParticipantsDropdown'
 import HowItWorks from './HowItWorks'
 import UserMenu from './UserMenu'
+import AppHeader from './AppHeader'
 import { useAuth } from '../context/useAuth'
+import { isEventEnded } from '../utils/eventStatus'
 
 export default function EventView({ eventData, eventId }) {
   const { user, authLoading } = useAuth()
   const [selectedDates, setSelectedDates] = useState({})
   const [participants, setParticipants] = useState([])
 
-  // A signed-out visitor can only view the event - editing availability is
-  // a protected, per-user action and requires a Google account.
-  const isGuest = !user
+  const eventEnded = isEventEnded(eventData)
+  const isCreator = !!user && !!eventData?.createdBy && eventData.createdBy === user.uid
+
+  // A signed-out visitor, or anyone once the event has ended, can only
+  // view the event - editing availability is a protected, per-user action.
+  const isGuest = !user || eventEnded
 
   useEffect(() => {
     if (!eventData?.eventName) return
@@ -149,9 +155,35 @@ export default function EventView({ eventData, eventId }) {
 
   return (
     <div>
-      <UserMenu />
+      <AppHeader
+        right={
+          <>
+            <ParticipantsDropdown
+              participants={participants}
+              eventId={eventId}
+              isCreator={isCreator}
+            />
+            <UserMenu isCreator={isCreator} />
+          </>
+        }
+      />
+
+      {eventEnded && (
+        <div className="mx-4 sm:mx-0 mt-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 px-5 py-4 flex flex-col sm:flex-row items-center gap-3 justify-center text-center sm:text-left">
+          <span className="text-2xl">⏳</span>
+          <p className="font-bold">
+            This event has ended. Want to plan the next one?
+          </p>
+          <Link
+            to="/"
+            className="rounded-xl bg-primary text-white text-sm font-bold px-4 py-2 hover:bg-primary-hover transition-colors duration-150"
+          >
+            Create a new event
+          </Link>
+        </div>
+      )}
+
       <HowItWorks EventView={true} />
-      <ParticipantsDropdown participants={participants} />
 
       <div
         style={{
@@ -160,7 +192,7 @@ export default function EventView({ eventData, eventId }) {
           backgroundColor: 'rgba(255, 255, 255, 0.3)',
           zIndex: 1,
         }}
-        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl flex flex-col sm:flex-row items-center align-middle justify-center mt-20 mb-20 lg:gap-25 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
+        className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl flex flex-col sm:flex-row items-center align-middle justify-center mt-10 mb-20 lg:gap-25 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
       >
         <div className="justify-center align-middle items-center mb-5 sm:mb-0">
           <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-primary font-bold">
@@ -214,6 +246,7 @@ export default function EventView({ eventData, eventId }) {
         scoreMap={scoreMap}
         participantsCount={participants.length}
         isGuest={isGuest}
+        eventEnded={eventEnded}
         authLoading={authLoading}
         eventData={eventData}
         eventId={eventId}

@@ -11,6 +11,7 @@ export default function AvailabilityGrid({
   scoreMap,
   participantsCount,
   isGuest,
+  eventEnded = false,
   eventData,
   eventId,
   selectedDates,
@@ -137,6 +138,10 @@ export default function AvailabilityGrid({
     <>
       {authLoading ? (
         <p className="mb-4 font-bold opacity-70">Checking your session…</p>
+      ) : eventEnded ? (
+        <p className="mb-6 font-bold text-slate-600 bg-white/40 backdrop-blur-md rounded-xl px-4 py-3 inline-block">
+          This event has ended, so availability can no longer be edited.
+        </p>
       ) : isGuest ? (
         <div className="mb-6">
           <LoginRequired message="Aby zaznaczyć swoją dostępność, zaloguj się przez Google. Możesz na razie przeglądać kalendarz." />

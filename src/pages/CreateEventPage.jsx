@@ -1,32 +1,24 @@
 import EventForm from '../components/EventForm'
 import HowItWorks from '../components/HowItWorks'
 import AuthControls from '../components/AuthControls'
-import WebImage from '../assets/web.png'
+import AppHeader from '../components/AppHeader'
 import { useState } from 'react'
 
 export default function CreateEventPage() {
   const [mClicked, setMClicked] = useState(false)
 
-  function handleMClick() {
+  function handleMClick(e) {
+    e.preventDefault() // logo stays a spin toy on the home page itself
     setMClicked(!mClicked)
   }
 
   return (
-    <div className="items-center align-middle justify-center flex flex-col gap-10 eventFormStyle">
-      <div className="absolute top-2 right-2 z-20">
-        <AuthControls />
-      </div>
-      <div className="relative w-50">
-        <img
-          onClick={handleMClick}
-          className={`active:scale-95 absolute -left-3.5 w-20 h-auto shadow-2xl shadow-gray-600 rounded-full top-5 cursor-pointer`}
-          src={WebImage}
-          alt="Web Image"
-        />
-        <h1 className="text-primary text-5xl pt-7 font-extrabold ">
-          <span className="text-6xl">M</span>eetler
-        </h1>
-      </div>
+    <div className="items-center align-middle justify-center flex flex-col gap-8 eventFormStyle">
+      <AppHeader onLogoClick={handleMClick} spin={mClicked} right={<AuthControls compact />} />
+
+      <h1 className="text-primary font-display text-2xl sm:text-3xl font-extrabold text-center px-4 mt-4">
+        Find a time that works for everyone.
+      </h1>
 
       <HowItWorks EventPage={true} />
       <div

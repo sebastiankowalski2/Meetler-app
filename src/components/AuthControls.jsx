@@ -23,10 +23,11 @@ export default function AuthControls({ compact = false, showEditName = false }) 
     return (
       <button
         onClick={signInWithGoogle}
-        className="flex items-center gap-2 bg-white text-black text-sm font-bold px-3 py-1.5 rounded-lg border-2 border-primary hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
+        title="Sign in with Google"
+        className="flex items-center gap-2 bg-white text-black text-sm font-bold rounded-full sm:rounded-lg border-2 border-primary hover:bg-gray-100 transition-colors duration-200 cursor-pointer p-2 sm:px-3 sm:py-1.5"
       >
         <GoogleIcon />
-        Sign in with Google
+        <span className="hidden sm:inline">Sign in with Google</span>
       </button>
     )
   }

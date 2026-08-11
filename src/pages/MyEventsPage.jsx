@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
   collection,
@@ -8,16 +8,23 @@ import {
   getDocs,
   doc,
   getDoc,
+  deleteDoc,
 } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from '../context/useAuth'
 import AuthControls from '../components/AuthControls'
+import AppHeader from '../components/AppHeader'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { toast } from 'react-hot-toast'
+import { isEventEnded } from '../utils/eventStatus'
 
 export default function MyEventsPage() {
   const { user, authLoading } = useAuth()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [pendingDelete, setPendingDelete] = useState(null) // { id, data } | null
+  const [pendingLeave, setPendingLeave] = useState(null) // { id, data } | null
+  const [busyEventId, setBusyEventId] = useState(null)
 
   useEffect(() => {
     if (authLoading) return
@@ -104,74 +111,192 @@ export default function MyEventsPage() {
     }
   }, [user, authLoading])
 
+  // Upcoming events first (soonest end date first), ended events pushed to
+  // the bottom and shown grayed-out rather than hidden entirely.
+  const sortedEvents = useMemo(() => {
+    const withStatus = events.map((event) => ({
+      ...event,
+      ended: isEventEnded(event.data),
+    }))
+
+    const byEndDateAsc = (a, b) =>
+      (a.data.dateEnd || '').localeCompare(b.data.dateEnd || '')
+
+    const upcoming = withStatus
+      .filter((e) => !e.ended)
+      .sort(byEndDateAsc)
+    const ended = withStatus
+      .filter((e) => e.ended)
+      .sort((a, b) => byEndDateAsc(b, a)) // most recently ended first
+
+    return [...upcoming, ...ended]
+  }, [events])
+
+  const deleteEventCompletely = async () => {
+    if (!pendingDelete) return
+    const { id } = pendingDelete
+    setBusyEventId(id)
+    try {
+      const participantsSnap = await getDocs(
+        collection(db, 'events', id, 'participants'),
+      )
+      await Promise.all(
+        participantsSnap.docs.map((p) => deleteDoc(p.ref)),
+      )
+      await deleteDoc(doc(db, 'events', id))
+
+      setEvents((prev) => prev.filter((e) => e.id !== id))
+      toast.success('Event deleted.')
+    } catch (error) {
+      console.error('Failed to delete event:', error)
+      toast.error('Could not delete this event.')
+    } finally {
+      setBusyEventId(null)
+      setPendingDelete(null)
+    }
+  }
+
+  const leaveEvent = async () => {
+    if (!pendingLeave || !user) return
+    const { id } = pendingLeave
+    setBusyEventId(id)
+    try {
+      await deleteDoc(doc(db, 'events', id, 'participants', user.uid))
+      setEvents((prev) => prev.filter((e) => e.id !== id))
+      toast.success('You left this event.')
+    } catch (error) {
+      console.error('Failed to leave event:', error)
+      toast.error('Could not remove your availability.')
+    } finally {
+      setBusyEventId(null)
+      setPendingLeave(null)
+    }
+  }
+
   return (
-    <div className="items-center align-middle justify-center flex flex-col gap-6 pt-10 px-4">
-      <h1 className="text-primary text-4xl font-extrabold">
-        📅 My Events
-      </h1>
+    <div className="min-h-full flex flex-col">
+      <AppHeader right={user ? <AuthControls compact /> : null} />
 
-      {!authLoading && !user && (
-        <div
-          style={{
-            backdropFilter: 'blur(10px)',
-            backgroundColor: 'rgba(255, 255, 255, 0.3)',
-          }}
-          className="flex flex-col items-center gap-4 p-6 rounded-2xl shadow-lg"
-        >
-          <p className="font-bold">
-            Sign in with Google to see events you created or joined.
+      <div className="items-center align-middle justify-center flex flex-col gap-6 pt-8 pb-16 px-4">
+        <h1 className="font-display text-primary text-3xl sm:text-4xl font-extrabold">
+          📅 My Events
+        </h1>
+
+        {!authLoading && !user && (
+          <div
+            style={{
+              backdropFilter: 'blur(10px)',
+              backgroundColor: 'rgba(255, 255, 255, 0.3)',
+            }}
+            className="flex flex-col items-center gap-4 p-6 rounded-2xl shadow-lg"
+          >
+            <p className="font-bold">
+              Sign in with Google to see events you created or joined.
+            </p>
+            <AuthControls />
+          </div>
+        )}
+
+        {user && loading && (
+          <p className="font-bold">Loading your events...</p>
+        )}
+
+        {user && !loading && sortedEvents.length === 0 && (
+          <p className="font-bold text-center max-w-sm">
+            No events yet. Create one, or open an invite link and set your
+            availability while signed in.
           </p>
-          <AuthControls />
-        </div>
-      )}
+        )}
 
-      {user && loading && <p className="font-bold">Loading your events...</p>}
+        {user && !loading && sortedEvents.length > 0 && (
+          <div className="flex flex-col gap-3 w-full max-w-xl">
+            {sortedEvents.map(({ id, data, roles, ended }) => {
+              const isCreatorRole = roles.has('creator')
+              const isBusy = busyEventId === id
 
-      {user && !loading && events.length === 0 && (
-        <p className="font-bold">
-          No events yet. Create one, or open an invite link and set your
-          availability while signed in.
-        </p>
-      )}
+              return (
+                <div
+                  key={id}
+                  style={{
+                    backdropFilter: 'blur(10px)',
+                    backgroundColor: ended
+                      ? 'rgba(255, 255, 255, 0.18)'
+                      : 'rgba(255, 255, 255, 0.35)',
+                  }}
+                  className={`relative rounded-xl shadow-md transition-shadow duration-200 ${ended ? 'opacity-60 hover:opacity-80' : 'hover:shadow-lg'}`}
+                >
+                  <Link
+                    to={`/event/${id}`}
+                    className="flex flex-col items-start gap-1 p-4 text-left"
+                  >
+                    <span className="text-lg font-extrabold text-primary pr-6">
+                      {data.eventName}
+                    </span>
+                    {data.eventLocation && (
+                      <span className="text-sm">🗺️ {data.eventLocation}</span>
+                    )}
+                    <span className="text-xs opacity-70">
+                      {data.dateStart && data.dateEnd
+                        ? `${data.dateStart} → ${data.dateEnd}`
+                        : null}
+                    </span>
+                    <span className="flex items-center gap-2 text-xs font-bold text-primary">
+                      {Array.from(roles)
+                        .map((role) =>
+                          role === 'creator' ? '👑 Creator' : '🙋 Participant',
+                        )
+                        .join(' · ')}
+                      {ended && (
+                        <span className="rounded-full bg-slate-200 text-slate-600 px-2 py-0.5">
+                          Ended
+                        </span>
+                      )}
+                    </span>
+                  </Link>
 
-      {user && !loading && events.length > 0 && (
-        <div className="flex flex-col gap-3 w-full max-w-xl">
-          {events.map(({ id, data, roles }) => (
-            <Link
-              key={id}
-              to={`/event/${id}`}
-              style={{
-                backdropFilter: 'blur(10px)',
-                backgroundColor: 'rgba(255, 255, 255, 0.35)',
-              }}
-              className="flex flex-col items-start gap-1 p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 text-left"
-            >
-              <span className="text-lg font-extrabold text-primary">
-                {data.eventName}
-              </span>
-              {data.eventLocation && (
-                <span className="text-sm">🗺️ {data.eventLocation}</span>
-              )}
-              <span className="text-xs opacity-70">
-                {data.dateStart && data.dateEnd
-                  ? `${data.dateStart} → ${data.dateEnd}`
-                  : null}
-              </span>
-              <span className="text-xs font-bold text-primary">
-                {Array.from(roles)
-                  .map((role) =>
-                    role === 'creator' ? '👑 Creator' : '🙋 Participant',
-                  )
-                  .join(' · ')}
-              </span>
-            </Link>
-          ))}
-        </div>
-      )}
+                  {isCreatorRole ? (
+                    <button
+                      disabled={isBusy}
+                      onClick={() => setPendingDelete({ id, data })}
+                      title="Delete event"
+                      className="absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors duration-150 cursor-pointer disabled:opacity-40"
+                    >
+                      🗑️
+                    </button>
+                  ) : (
+                    <button
+                      disabled={isBusy}
+                      onClick={() => setPendingLeave({ id, data })}
+                      title="Remove from My Events"
+                      className="absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors duration-150 cursor-pointer disabled:opacity-40"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
 
-      <Link to="/" className="text-primary font-bold hover:underline mt-4">
-        ← Back to home
-      </Link>
+      <ConfirmDialog
+        open={!!pendingDelete}
+        title="Delete this event?"
+        message={`"${pendingDelete?.data?.eventName}" and everyone's availability will be permanently deleted. This can't be undone.`}
+        confirmLabel="Delete event"
+        onConfirm={deleteEventCompletely}
+        onCancel={() => setPendingDelete(null)}
+      />
+
+      <ConfirmDialog
+        open={!!pendingLeave}
+        title="Remove yourself from this event?"
+        message={`Your availability for "${pendingLeave?.data?.eventName}" will be deleted and it will disappear from My Events. You can rejoin later using the event link.`}
+        confirmLabel="Remove me"
+        onConfirm={leaveEvent}
+        onCancel={() => setPendingLeave(null)}
+      />
     </div>
   )
 }

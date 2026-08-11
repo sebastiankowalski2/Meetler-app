@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function CalendarButton({
   dateParticipantsMap,
@@ -35,11 +35,12 @@ export default function CalendarButton({
 
   const people = dateParticipantsMap[propDate] || []
 
-  window.addEventListener('scroll', () => {
-    if (hovered) {
-      setHovered(false)
-    }
-  })
+  useEffect(() => {
+    if (!hovered) return
+    const handleScroll = () => setHovered(false)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [hovered])
 
   return (
     <div>

@@ -1,31 +1,34 @@
 @import 'tailwindcss';
 
-/* niebieski motyw */
+/* Modern indigo + amber theme */
 @theme {
-  --color-primary: #2b7fff;
-  --color-primary-rgb: 43, 127, 255;
-  --color-primary-hover: #1e5bbf;
+  --color-primary: #4f46e5;
+  --color-primary-rgb: 79, 70, 229;
+  --color-primary-hover: #4338ca;
 
-  --color-secondary: #fcd34d;
-  --color-secondary-rgb: 252, 211, 77;
+  --color-secondary: #fbbf24;
+  --color-secondary-rgb: 251, 191, 36;
+
+  --font-display: 'Sora', 'Inter', sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
-
-/* czarny motyw */
-/* @theme {
-  --color-primary: #000000;
-  --color-primary-rgb: 0, 0, 0;
-  --color-primary-hover: #333333;
-
-  --color-secondary: #fcd34d;
-  --color-secondary-rgb: 252, 211, 77;
-} */
 
 @layer base {
   html {
     @apply h-full w-full;
   }
-  /*bg-gray-500 ?? */
+
   body {
-    @apply bg-gradient-to-br from-green-500 to-yellow-300 text-slate-900 bg-no-repeat bg-fixed;
+    font-family: var(--font-sans);
+    background: linear-gradient(135deg, rgb(41, 219, 21) 0%, #fbff00 100%);
+    color: #0f172a;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
   }
 }

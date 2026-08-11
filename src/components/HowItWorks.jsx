@@ -5,7 +5,7 @@ export default function HowItWorks({ EventView, EventPage }) {
     <>
       <div className="flex items-center justify-center">
         <div
-          className={`hover:shadow-secondary border-2 border-white hover:border-secondary flex ${EventPage ? 'mt-0' : ' mt-24'} flex-col items-center justify-center p-4 mx-2 bg-gray-100 rounded-md shadow-lg transition-all duration-500 shadow-black ${EventView ? ' w-92' : 'w-92'}`}
+          className={`hover:shadow-secondary border-2 border-white hover:border-secondary flex ${EventPage ? 'mt-0' : EventView ? 'mt-6' : 'mt-10'} flex-col items-center justify-center p-4 mx-2 bg-gray-100 rounded-md shadow-lg transition-all duration-500 shadow-black ${EventView ? ' w-92' : 'w-92'}`}
         >
           <h1 className="text-2xl font-extrabold mb-4">📌How it works?</h1>
           <ol style={{ listStyleType: 'decimal' }} className="gap-4 text-left">
