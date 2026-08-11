@@ -10,7 +10,7 @@ function App() {
   return (
     <>
       <Toaster
-        position="top-right"
+        position="top-center"
         toastOptions={{
           className: 'meetler-toast',
         }}
