@@ -13,8 +13,12 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="items-center align-middle justify-center flex flex-col gap-8 eventFormStyle">
-      <AppHeader onLogoClick={handleMClick} spin={mClicked} right={<AuthControls compact />} />
+    <div className="items-center align-middle justify-center flex flex-col gap-4 eventFormStyle">
+      <AppHeader
+        onLogoClick={handleMClick}
+        spin={mClicked}
+        right={<AuthControls compact />}
+      />
 
       <h1 className="text-primary font-display text-2xl sm:text-3xl font-extrabold text-center px-4 mt-4">
         Find a time that works for everyone.

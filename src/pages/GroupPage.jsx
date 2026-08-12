@@ -72,9 +72,7 @@ export default function GroupPage() {
         if (!cancelled) {
           setGroup(groupSnap.data())
           setMembers(memberList)
-          setEvents(
-            eventsSnap.docs.map((d) => ({ id: d.id, data: d.data() })),
-          )
+          setEvents(eventsSnap.docs.map((d) => ({ id: d.id, data: d.data() })))
         }
       } catch (error) {
         console.error('Failed to load group:', error)
@@ -92,7 +90,10 @@ export default function GroupPage() {
   }, [groupId, user, authLoading, navigate])
 
   const sortedEvents = useMemo(() => {
-    const withStatus = events.map((e) => ({ ...e, ended: isEventEnded(e.data) }))
+    const withStatus = events.map((e) => ({
+      ...e,
+      ended: isEventEnded(e.data),
+    }))
     const byEndDateAsc = (a, b) =>
       (a.data.dateEnd || '').localeCompare(b.data.dateEnd || '')
     const upcoming = withStatus.filter((e) => !e.ended).sort(byEndDateAsc)
@@ -118,7 +119,9 @@ export default function GroupPage() {
       setMembers((prev) =>
         prev.filter((m) => m.uid !== pendingRemoveMember.uid),
       )
-      toast.success(`Removed ${pendingRemoveMember.displayName} from the group.`)
+      toast.success(
+        `Removed ${pendingRemoveMember.displayName} from the group.`,
+      )
     } catch (error) {
       console.error('Failed to remove member:', error)
       toast.error('Could not remove this member.')
@@ -240,8 +243,8 @@ export default function GroupPage() {
                     className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm font-bold text-slate-800 hover:bg-white/50"
                   >
                     <span className="truncate">
+                      {member.uid === group.ownerUid && '👑 '}
                       {member.displayName}
-                      {member.uid === group.ownerUid && ' 👑'}
                     </span>
                     {isOwner && member.uid !== user.uid && (
                       <button
@@ -270,9 +273,7 @@ export default function GroupPage() {
               </button>
             </div>
 
-            {showCreateEvent && (
-              <EventForm groupId={groupId} />
-            )}
+            {showCreateEvent && <EventForm groupId={groupId} />}
 
             {sortedEvents.length === 0 && (
               <p className="font-bold text-center max-w-sm opacity-80">
@@ -324,7 +325,6 @@ export default function GroupPage() {
         onConfirm={deleteGroup}
         onCancel={() => setPendingDeleteGroup(false)}
       />
-
     </div>
   )
 }
