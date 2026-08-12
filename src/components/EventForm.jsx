@@ -5,7 +5,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { toast } from 'react-hot-toast'
 import { useAuth } from '../context/useAuth'
 
-export default function EventForm({ mClicked }) {
+export default function EventForm({ mClicked, groupId = null, onCreated }) {
   const navigate = useNavigate()
   const { user } = useAuth()
 
@@ -48,6 +48,7 @@ export default function EventForm({ mClicked }) {
         ...formData,
         createdBy: user ? user.uid : null,
         createdByName: user ? user.displayName || user.email : null,
+        groupId,
         createdAt: serverTimestamp(),
       })
 
@@ -59,8 +60,12 @@ export default function EventForm({ mClicked }) {
         dateEnd: '',
       })
 
-      // Navigate to the newly created event page using the generated document ID
-      navigate(`/event/${docRef.id}`)
+      if (onCreated) {
+        onCreated(docRef.id)
+      } else {
+        // Navigate to the newly created event page using the generated document ID
+        navigate(`/event/${docRef.id}`)
+      }
     } catch (e) {
       console.error('Error adding document: ', e)
     }

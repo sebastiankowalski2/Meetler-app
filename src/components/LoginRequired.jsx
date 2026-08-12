@@ -13,7 +13,7 @@ export default function LoginRequired({ message }) {
       className="flex flex-col items-center gap-3 p-4 rounded-xl shadow-md text-center"
     >
       <p className="font-bold">
-        {message || 'To use this feature, sign in with Google.'}
+        {message || 'Aby korzystać z tej funkcji, zaloguj się przez Google.'}
       </p>
       <AuthControls />
     </div>

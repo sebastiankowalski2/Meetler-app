@@ -5,8 +5,9 @@ service cloud.firestore {
 
     match /events/{eventId} {
       // Anyone with the link can read an event (that's the whole point of
-      // the app - no login required to view/join).
-      allow read;
+      // the app - no login required to view/join). Split into get/list
+      // explicitly rather than relying on the "read" shorthand.
+      allow get, list: if true;
 
       // Anyone can create an event (guest or logged-in). If createdBy is
       // set, it must match the caller's own uid - no impersonating others.
@@ -18,7 +19,7 @@ service cloud.firestore {
         && resource.data.createdBy == request.auth.uid;
 
       match /participants/{participantId} {
-        allow read;
+        allow get, list: if true;
 
         // Availability is a per-user action: it requires a signed-in
         // Google account, the participant doc id must be the caller's own
@@ -35,6 +36,38 @@ service cloud.firestore {
             // ...or, as the event's creator, remove a participant / cascade
             // delete every participant doc when deleting the event itself.
             || get(/databases/$(database)/documents/events/$(eventId)).data.createdBy == request.auth.uid
+          );
+      }
+    }
+
+    match /groups/{groupId} {
+      // Any signed-in user can look up a group by id (e.g. from a join
+      // link) to see its name/member count before deciding to join.
+      allow get: if request.auth != null;
+
+      allow create: if request.auth != null
+        && request.resource.data.ownerUid == request.auth.uid;
+
+      // Only the owner can rename or delete the group itself.
+      allow update, delete: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid;
+
+      match /members/{memberId} {
+        allow get, list: if request.auth != null;
+
+        // Joining a group is a per-user action: you can only create your
+        // own membership doc.
+        allow create: if request.auth != null
+          && memberId == request.auth.uid
+          && request.resource.data.uid == request.auth.uid;
+
+        allow delete: if request.auth != null
+          && (
+            // Leave the group yourself...
+            memberId == request.auth.uid
+            // ...or, as the group's owner, remove a member / cascade
+            // delete every membership when deleting the group itself.
+            || get(/databases/$(database)/documents/groups/$(groupId)).data.ownerUid == request.auth.uid
           );
       }
     }

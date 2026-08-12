@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   collection,
   collectionGroup,
@@ -9,36 +9,49 @@ import {
   doc,
   getDoc,
   deleteDoc,
+  addDoc,
+  setDoc,
+  serverTimestamp,
 } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from '../context/useAuth'
 import AuthControls from '../components/AuthControls'
 import AppHeader from '../components/AppHeader'
 import ConfirmDialog from '../components/ConfirmDialog'
+import CreateGroupDialog from '../components/CreateGroupDialog'
+import EventListCard from '../components/EventListCard'
 import { toast } from 'react-hot-toast'
 import { isEventEnded } from '../utils/eventStatus'
 
 export default function MyEventsPage() {
   const { user, authLoading } = useAuth()
+  const navigate = useNavigate()
+  const [tab, setTab] = useState('events') // 'events' | 'groups'
+
   const [events, setEvents] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [eventsLoading, setEventsLoading] = useState(true)
   const [pendingDelete, setPendingDelete] = useState(null) // { id, data } | null
   const [pendingLeave, setPendingLeave] = useState(null) // { id, data } | null
   const [busyEventId, setBusyEventId] = useState(null)
+
+  const [groups, setGroups] = useState([])
+  const [groupsLoading, setGroupsLoading] = useState(true)
+  const [showCreateGroup, setShowCreateGroup] = useState(false)
+  const [creatingGroup, setCreatingGroup] = useState(false)
 
   useEffect(() => {
     if (authLoading) return
 
     if (!user) {
       setEvents([])
-      setLoading(false)
+      setEventsLoading(false)
       return
     }
 
     let cancelled = false
 
     const loadMyEvents = async () => {
-      setLoading(true)
+      setEventsLoading(true)
       try {
         const results = new Map() // eventId -> { id, data, roles: Set }
 
@@ -100,11 +113,75 @@ export default function MyEventsPage() {
           toast.error('Could not load your events.')
         }
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) setEventsLoading(false)
       }
     }
 
     loadMyEvents()
+
+    return () => {
+      cancelled = true
+    }
+  }, [user, authLoading])
+
+  useEffect(() => {
+    if (authLoading) return
+
+    if (!user) {
+      setGroups([])
+      setGroupsLoading(false)
+      return
+    }
+
+    let cancelled = false
+
+    const loadMyGroups = async () => {
+      setGroupsLoading(true)
+      try {
+        // Groups the user belongs to, found via a collection-group query on
+        // "members" subcollections. Requires a Firestore collection-group
+        // index on members.uid.
+        const membershipQuery = query(
+          collectionGroup(db, 'members'),
+          where('uid', '==', user.uid),
+        )
+        const membershipSnap = await getDocs(membershipQuery)
+
+        const groupIds = membershipSnap.docs.map(
+          (memberDoc) => memberDoc.ref.parent.parent.id,
+        )
+
+        const groupResults = await Promise.all(
+          groupIds.map(async (groupId) => {
+            const groupSnap = await getDoc(doc(db, 'groups', groupId))
+            if (!groupSnap.exists()) return null
+
+            const membersSnap = await getDocs(
+              collection(db, 'groups', groupId, 'members'),
+            )
+
+            return {
+              id: groupId,
+              data: groupSnap.data(),
+              memberCount: membersSnap.size,
+            }
+          }),
+        )
+
+        if (!cancelled) {
+          setGroups(groupResults.filter(Boolean))
+        }
+      } catch (error) {
+        console.error('Failed to load my groups:', error)
+        if (!cancelled) {
+          toast.error('Could not load your groups.')
+        }
+      } finally {
+        if (!cancelled) setGroupsLoading(false)
+      }
+    }
+
+    loadMyGroups()
 
     return () => {
       cancelled = true
@@ -122,9 +199,7 @@ export default function MyEventsPage() {
     const byEndDateAsc = (a, b) =>
       (a.data.dateEnd || '').localeCompare(b.data.dateEnd || '')
 
-    const upcoming = withStatus
-      .filter((e) => !e.ended)
-      .sort(byEndDateAsc)
+    const upcoming = withStatus.filter((e) => !e.ended).sort(byEndDateAsc)
     const ended = withStatus
       .filter((e) => e.ended)
       .sort((a, b) => byEndDateAsc(b, a)) // most recently ended first
@@ -140,9 +215,7 @@ export default function MyEventsPage() {
       const participantsSnap = await getDocs(
         collection(db, 'events', id, 'participants'),
       )
-      await Promise.all(
-        participantsSnap.docs.map((p) => deleteDoc(p.ref)),
-      )
+      await Promise.all(participantsSnap.docs.map((p) => deleteDoc(p.ref)))
       await deleteDoc(doc(db, 'events', id))
 
       setEvents((prev) => prev.filter((e) => e.id !== id))
@@ -173,13 +246,42 @@ export default function MyEventsPage() {
     }
   }
 
+  const createGroup = async (name) => {
+    if (!user) return
+    setCreatingGroup(true)
+    try {
+      const groupRef = await addDoc(collection(db, 'groups'), {
+        name,
+        ownerUid: user.uid,
+        ownerName: user.displayName || user.email || 'Anonymous',
+        createdAt: serverTimestamp(),
+      })
+
+      // The owner is automatically a member too.
+      await setDoc(doc(db, 'groups', groupRef.id, 'members', user.uid), {
+        uid: user.uid,
+        displayName: user.displayName || user.email || 'Anonymous',
+        joinedAt: serverTimestamp(),
+      })
+
+      toast.success('Group created!')
+      setShowCreateGroup(false)
+      navigate(`/group/${groupRef.id}`)
+    } catch (error) {
+      console.error('Failed to create group:', error)
+      toast.error('Could not create the group.')
+    } finally {
+      setCreatingGroup(false)
+    }
+  }
+
   return (
     <div className="min-h-full flex flex-col">
       <AppHeader right={user ? <AuthControls compact /> : null} />
 
       <div className="items-center align-middle justify-center flex flex-col gap-6 pt-8 pb-16 px-4">
         <h1 className="font-display text-primary text-3xl sm:text-4xl font-extrabold">
-          📅 My Events
+          My Meetler
         </h1>
 
         {!authLoading && !user && (
@@ -191,91 +293,122 @@ export default function MyEventsPage() {
             className="flex flex-col items-center gap-4 p-6 rounded-2xl shadow-lg"
           >
             <p className="font-bold">
-              Sign in with Google to see events you created or joined.
+              Sign in with Google to see your events and groups.
             </p>
             <AuthControls />
           </div>
         )}
 
-        {user && loading && (
+        {user && (
+          <div className="flex items-center gap-1 rounded-full bg-white/50 backdrop-blur-md p-1 shadow-inner">
+            <button
+              onClick={() => setTab('events')}
+              className={`rounded-full px-4 py-1.5 text-sm font-bold transition-colors duration-150 cursor-pointer ${tab === 'events' ? 'bg-primary text-white' : 'text-slate-600 hover:bg-white/60'}`}
+            >
+              📅 Events
+            </button>
+            <button
+              onClick={() => setTab('groups')}
+              className={`rounded-full px-4 py-1.5 text-sm font-bold transition-colors duration-150 cursor-pointer ${tab === 'groups' ? 'bg-primary text-white' : 'text-slate-600 hover:bg-white/60'}`}
+            >
+              👥 Groups
+            </button>
+          </div>
+        )}
+
+        {user && tab === 'events' && eventsLoading && (
           <p className="font-bold">Loading your events...</p>
         )}
 
-        {user && !loading && sortedEvents.length === 0 && (
+        {user && tab === 'events' && !eventsLoading && sortedEvents.length === 0 && (
           <p className="font-bold text-center max-w-sm">
             No events yet. Create one, or open an invite link and set your
             availability while signed in.
           </p>
         )}
 
-        {user && !loading && sortedEvents.length > 0 && (
+        {user && tab === 'events' && !eventsLoading && sortedEvents.length > 0 && (
           <div className="flex flex-col gap-3 w-full max-w-xl">
             {sortedEvents.map(({ id, data, roles, ended }) => {
               const isCreatorRole = roles.has('creator')
               const isBusy = busyEventId === id
 
               return (
-                <div
+                <EventListCard
                   key={id}
-                  style={{
-                    backdropFilter: 'blur(10px)',
-                    backgroundColor: ended
-                      ? 'rgba(255, 255, 255, 0.18)'
-                      : 'rgba(255, 255, 255, 0.35)',
-                  }}
-                  className={`relative rounded-xl shadow-md transition-shadow duration-200 ${ended ? 'opacity-60 hover:opacity-80' : 'hover:shadow-lg'}`}
-                >
-                  <Link
-                    to={`/event/${id}`}
-                    className="flex flex-col items-start gap-1 p-4 text-left"
-                  >
-                    <span className="text-lg font-extrabold text-primary pr-6">
-                      {data.eventName}
-                    </span>
-                    {data.eventLocation && (
-                      <span className="text-sm">🗺️ {data.eventLocation}</span>
-                    )}
-                    <span className="text-xs opacity-70">
-                      {data.dateStart && data.dateEnd
-                        ? `${data.dateStart} → ${data.dateEnd}`
-                        : null}
-                    </span>
-                    <span className="flex items-center gap-2 text-xs font-bold text-primary">
-                      {Array.from(roles)
-                        .map((role) =>
-                          role === 'creator' ? '👑 Creator' : '🙋 Participant',
-                        )
-                        .join(' · ')}
-                      {ended && (
-                        <span className="rounded-full bg-slate-200 text-slate-600 px-2 py-0.5">
-                          Ended
-                        </span>
-                      )}
-                    </span>
-                  </Link>
-
-                  {isCreatorRole ? (
-                    <button
-                      disabled={isBusy}
-                      onClick={() => setPendingDelete({ id, data })}
-                      title="Delete event"
-                      className="absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors duration-150 cursor-pointer disabled:opacity-40"
-                    >
-                      🗑️
-                    </button>
-                  ) : (
-                    <button
-                      disabled={isBusy}
-                      onClick={() => setPendingLeave({ id, data })}
-                      title="Remove from My Events"
-                      className="absolute top-3 right-3 text-slate-400 hover:text-rose-600 transition-colors duration-150 cursor-pointer disabled:opacity-40"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
+                  id={id}
+                  data={data}
+                  ended={ended}
+                  badge={Array.from(roles)
+                    .map((role) =>
+                      role === 'creator' ? '👑 Creator' : '🙋 Participant',
+                    )
+                    .join(' · ')}
+                  cornerAction={
+                    isCreatorRole
+                      ? {
+                          icon: '🗑️',
+                          title: 'Delete event',
+                          disabled: isBusy,
+                          onClick: () => setPendingDelete({ id, data }),
+                        }
+                      : {
+                          icon: '✕',
+                          title: 'Remove from My Events',
+                          disabled: isBusy,
+                          onClick: () => setPendingLeave({ id, data }),
+                        }
+                  }
+                />
               )
             })}
+          </div>
+        )}
+
+        {user && tab === 'groups' && (
+          <div className="flex flex-col gap-3 w-full max-w-xl">
+            <button
+              onClick={() => setShowCreateGroup(true)}
+              className="self-center rounded-xl bg-primary text-white text-sm font-bold px-4 py-2 hover:bg-primary-hover transition-colors duration-150 cursor-pointer"
+            >
+              + New group
+            </button>
+
+            {groupsLoading && (
+              <p className="font-bold text-center">Loading your groups...</p>
+            )}
+
+            {!groupsLoading && groups.length === 0 && (
+              <p className="font-bold text-center max-w-sm mx-auto">
+                No groups yet. Create one to organize recurring events with
+                the same people.
+              </p>
+            )}
+
+            {!groupsLoading &&
+              groups.map(({ id, data, memberCount }) => (
+                <Link
+                  key={id}
+                  to={`/group/${id}`}
+                  style={{
+                    backdropFilter: 'blur(10px)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                  }}
+                  className="flex flex-col items-start gap-1 p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200"
+                >
+                  <span className="text-lg font-extrabold text-primary">
+                    👥 {data.name}
+                  </span>
+                  <span className="text-xs opacity-70">
+                    {memberCount} {memberCount === 1 ? 'member' : 'members'}
+                  </span>
+                  {data.ownerUid === user.uid && (
+                    <span className="text-xs font-bold text-primary">
+                      👑 Owner
+                    </span>
+                  )}
+                </Link>
+              ))}
           </div>
         )}
       </div>
@@ -296,6 +429,13 @@ export default function MyEventsPage() {
         confirmLabel="Remove me"
         onConfirm={leaveEvent}
         onCancel={() => setPendingLeave(null)}
+      />
+
+      <CreateGroupDialog
+        open={showCreateGroup}
+        busy={creatingGroup}
+        onCreate={createGroup}
+        onCancel={() => setShowCreateGroup(false)}
       />
     </div>
   )

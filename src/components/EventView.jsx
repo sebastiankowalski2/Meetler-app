@@ -17,8 +17,7 @@ export default function EventView({ eventData, eventId }) {
   const [participants, setParticipants] = useState([])
 
   const eventEnded = isEventEnded(eventData)
-  const isCreator =
-    !!user && !!eventData?.createdBy && eventData.createdBy === user.uid
+  const isCreator = !!user && !!eventData?.createdBy && eventData.createdBy === user.uid
 
   // A signed-out visitor, or anyone once the event has ended, can only
   // view the event - editing availability is a protected, per-user action.
