@@ -73,7 +73,18 @@ export default function HowItWorks({ EventView, EventPage }) {
           )}
           {!EventPage && (
             <li className="font-bold text-sm">
-              Change your availability at any time.
+              After saving, tap "Change availability" if you need to edit it
+              again.
+            </li>
+          )}
+          {!EventPage && (
+            <li className="font-bold text-sm">
+              Only the event creator can confirm the final date.
+            </li>
+          )}
+          {!EventPage && (
+            <li className="font-bold text-sm">
+              Once confirmed, you can add the event to Google Calendar.
             </li>
           )}
         </ol>

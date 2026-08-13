@@ -3,12 +3,15 @@ import { doc, deleteDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 import ConfirmDialog from './ConfirmDialog'
+import { useAuth } from '../context/useAuth'
 
 export default function ParticipantsDropdown({
   participants,
   eventId,
   isCreator = false,
+  onSelfRemoved,
 }) {
+  const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [pendingRemoval, setPendingRemoval] = useState(null) // participant or null
   const containerRef = useRef(null)
@@ -26,13 +29,17 @@ export default function ParticipantsDropdown({
 
   const removeParticipant = async () => {
     if (!pendingRemoval) return
+    const isSelf = pendingRemoval.uid === user?.uid
     try {
       await deleteDoc(
         doc(db, 'events', eventId, 'participants', pendingRemoval.uid),
       )
       toast.success(
-        `Removed ${pendingRemoval.displayName || 'participant'} from the event.`,
+        isSelf
+          ? 'You were removed from this event.'
+          : `Removed ${pendingRemoval.displayName || 'participant'} from the event.`,
       )
+      if (isSelf) onSelfRemoved?.()
     } catch (error) {
       console.error('Failed to remove participant:', error)
       toast.error('Could not remove this participant.')
@@ -75,10 +82,14 @@ export default function ParticipantsDropdown({
               <span className="truncate">
                 {participant.displayName || 'Anonymous'}
               </span>
-              {isCreator && (
+              {(isCreator || participant.uid === user?.uid) && (
                 <button
                   onClick={() => setPendingRemoval(participant)}
-                  title="Remove from event"
+                  title={
+                    participant.uid === user?.uid
+                      ? 'Remove yourself from this event'
+                      : 'Remove from event'
+                  }
                   className="text-slate-400 hover:text-rose-600 cursor-pointer leading-none shrink-0"
                 >
                   ✕
@@ -91,8 +102,16 @@ export default function ParticipantsDropdown({
 
       <ConfirmDialog
         open={!!pendingRemoval}
-        title="Remove participant?"
-        message={`${pendingRemoval?.displayName || 'This participant'} will be removed from the event and their availability will be deleted.`}
+        title={
+          pendingRemoval?.uid === user?.uid
+            ? 'Remove yourself from this event?'
+            : 'Remove participant?'
+        }
+        message={
+          pendingRemoval?.uid === user?.uid
+            ? "Your availability will be deleted and won't count toward the final date anymore."
+            : `${pendingRemoval?.displayName || 'This participant'} will be removed from the event and their availability will be deleted.`
+        }
         confirmLabel="Remove"
         onConfirm={removeParticipant}
         onCancel={() => setPendingRemoval(null)}

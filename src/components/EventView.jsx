@@ -24,6 +24,7 @@ export default function EventView({ eventData, eventId }) {
   const { user, authLoading } = useAuth()
   const [selectedDates, setSelectedDates] = useState({})
   const [participants, setParticipants] = useState([])
+  const [hadSavedAvailability, setHadSavedAvailability] = useState(false)
 
   const eventEnded = isEventEnded(eventData)
   const isCreator =
@@ -61,6 +62,11 @@ export default function EventView({ eventData, eventId }) {
     }
   }
 
+  const handleSelfRemoved = () => {
+    setSelectedDates({})
+    setHadSavedAvailability(false)
+  }
+
   useEffect(() => {
     if (!eventData?.eventName) return
 
@@ -79,6 +85,7 @@ export default function EventView({ eventData, eventId }) {
     const preloadAvailability = async () => {
       if (!user) {
         setSelectedDates({})
+        setHadSavedAvailability(false)
         return
       }
 
@@ -98,6 +105,7 @@ export default function EventView({ eventData, eventId }) {
         if (snapshot.exists()) {
           const data = snapshot.data()
           setSelectedDates(data.availability || {})
+          setHadSavedAvailability(true)
           toast.success('Loaded previous availability', {
             style: {
               fontStyle: 'extra-bold',
@@ -108,6 +116,7 @@ export default function EventView({ eventData, eventId }) {
           })
         } else {
           setSelectedDates({})
+          setHadSavedAvailability(false)
         }
       } catch (error) {
         if (!cancelled) {
@@ -201,6 +210,7 @@ export default function EventView({ eventData, eventId }) {
               participants={participants}
               eventId={eventId}
               isCreator={isCreator}
+              onSelfRemoved={handleSelfRemoved}
             />
             <UserMenu avatarOnly isCreator={isCreator} />
           </>
@@ -291,23 +301,25 @@ export default function EventView({ eventData, eventId }) {
           </button>
         </div>
         <div className="px-5 max-w-88 sm:max-w-200 items-center rounded-2xl flex flex-col gap-4">
-          <div className="mt-5 justify-center flex align-middle items-center gap-2">
-            <h2 className="text-2xl font-extrabold md:text-2xl lg:text-3xl pr-2 pl-2 text-primary inset-shadow-sm shadow-sm">
-              {eventData.eventName.toUpperCase()}
-            </h2>
-            {isCreator && !eventEnded && (
-              <button
-                onClick={() => setShowEditEvent(true)}
-                title="Edit event"
-                className="text-lg opacity-60 hover:opacity-100 cursor-pointer"
-              >
-                ✏️
-              </button>
-            )}
+          <div className="relative mt-5 flex w-full items-center justify-center gap-2">
+            <div className="relative flex items-center justify-center">
+              <h2 className="text-2xl font-extrabold md:text-2xl lg:text-3xl pr-2 pl-2 text-primary inset-shadow-sm shadow-sm text-center">
+                {eventData.eventName.toUpperCase()}
+              </h2>
+              {isCreator && !eventEnded && (
+                <button
+                  onClick={() => setShowEditEvent(true)}
+                  title="Edit event"
+                  className="absolute right-0 transform translate-x-8 text-lg opacity-60 hover:opacity-100 cursor-pointer"
+                >
+                  ✏️
+                </button>
+              )}
+            </div>
           </div>
 
           {eventData.eventLocation && (
-            <div className="mb-1 justify-center flex align-middle items-center">
+            <div className="mb-1 w-full justify-center flex align-middle items-center">
               <span className="text-md md:text-xl lg:text-2xl pb-2 pr-1">
                 🏠
               </span>
@@ -336,6 +348,7 @@ export default function EventView({ eventData, eventId }) {
         isCreator={isCreator}
         confirmedDate={confirmedDate}
         onConfirmDate={confirmDate}
+        hadSavedAvailability={hadSavedAvailability}
       />
 
       {showEditEvent && (

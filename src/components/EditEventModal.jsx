@@ -29,6 +29,11 @@ export default function EditEventModal({
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (formData.dateStart < today || formData.dateEnd < today) {
+      toast.error('Dates cannot be in the past.')
+      return
+    }
+
     if (formData.dateEnd < formData.dateStart) {
       toast.error('End date cannot be before start date.')
       return
@@ -100,6 +105,7 @@ export default function EditEventModal({
               value={formData.dateStart}
               onChange={handleChange}
               disabled={datesLocked}
+              min={today}
               required
             />
           </div>
@@ -115,6 +121,7 @@ export default function EditEventModal({
               value={formData.dateEnd}
               onChange={handleChange}
               disabled={datesLocked}
+              min={today}
               required
             />
           </div>

@@ -19,8 +19,17 @@ export default function AvailabilityGrid({
   isCreator = false,
   confirmedDate = null,
   onConfirmDate,
+  hadSavedAvailability = false,
 }) {
   const [firstClick, setFirstClick] = useState(false)
+  // "justSaved" flips true right after a successful save this session;
+  // "manuallyUnlocked" flips true when the person clicks "Change
+  // availability". Together with the hadSavedAvailability prop (from an
+  // earlier visit) this derives whether the grid should be locked, without
+  // needing an effect to sync state from a prop.
+  const [justSaved, setJustSaved] = useState(false)
+  const [manuallyUnlocked, setManuallyUnlocked] = useState(false)
+  const locked = (hadSavedAvailability || justSaved) && !manuallyUnlocked
   const { user, authLoading } = useAuth()
 
   // Parse YYYY-MM-DD into a local Date to avoid timezone shifts.
@@ -128,10 +137,17 @@ export default function AvailabilityGrid({
         },
       })
       setFirstClick(false)
+      setJustSaved(true)
+      setManuallyUnlocked(false)
     } catch (error) {
       console.error(error)
       toast.error('Failed to save availability.')
     }
+  }
+
+  const unlockForEditing = () => {
+    setManuallyUnlocked(true)
+    setFirstClick(false)
   }
 
   const scores = Object.values(scoreMap)
@@ -139,7 +155,7 @@ export default function AvailabilityGrid({
 
   const topDates = Object.entries(scoreMap)
     .filter(([, score]) => score > 0)
-    .sort((a, b) => b[1] - a[1])
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, 5)
 
   const formatDate = (dateString) =>
@@ -164,9 +180,12 @@ export default function AvailabilityGrid({
               }}
               className="mb-6 w-full max-w-md rounded-2xl shadow-md p-4"
             >
-              <h3 className="font-display font-extrabold text-primary mb-2">
+              <h3 className="font-display font-extrabold text-primary mb-1">
                 🏆 Pick the final date
               </h3>
+              <p className="text-xs opacity-70 mb-2">
+                🔒 Only you can see this - you're the event creator.
+              </p>
               <ul className="flex flex-col gap-1.5">
                 {topDates.map(([date, score]) => (
                   <li
@@ -217,6 +236,13 @@ export default function AvailabilityGrid({
         <div className="mb-6">
           <LoginRequired message="Aby zaznaczyć swoją dostępność, zaloguj się przez Google. Możesz na razie przeglądać kalendarz." />
         </div>
+      ) : locked ? (
+        <button
+          onClick={unlockForEditing}
+          className="z-50 text-md sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-white text-primary border-2 border-primary px-4 py-2 rounded-lg hover:bg-primary/10 transition-colors duration-250 cursor-pointer"
+        >
+          ✏️ Change availability
+        </button>
       ) : (
         <button
           disabled={!firstClick}
@@ -275,7 +301,7 @@ export default function AvailabilityGrid({
                     scoreMap={scoreMap}
                     maxScore={maxScore}
                     participantsCount={participantsCount}
-                    isGuest={isGuest}
+                    isGuest={isGuest || locked}
                     isLocked={!!confirmedDate}
                     isConfirmed={confirmedDate === date}
                     key={index}

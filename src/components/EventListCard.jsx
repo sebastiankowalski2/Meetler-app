@@ -15,17 +15,17 @@ export default function EventListCard({
           ? 'rgba(255, 255, 255, 0.18)'
           : 'rgba(255, 255, 255, 0.35)',
       }}
-      className={`relative rounded-xl shadow-md transition-shadow duration-200 ${ended ? 'opacity-60 hover:opacity-80' : 'hover:shadow-lg'}`}
+      className={`relative rounded-xl px-0 shadow-md transition-shadow duration-200 ${ended ? 'opacity-60 hover:opacity-80' : 'hover:shadow-lg'}`}
     >
       <Link
         to={`/event/${id}`}
         className="flex flex-col items-start gap-1 p-4 text-left"
       >
-        <span className="text-lg font-extrabold text-primary pr-6">
+        <span className="pb-2 text-xl font-extrabold text-primary pr-6">
           {data.eventName}
         </span>
         {data.eventLocation && (
-          <span className="text-sm">🏠 {data.eventLocation}</span>
+          <span className="pb-2 text-sm">🏠 {data.eventLocation}</span>
         )}
         <span className="text-xs opacity-70">
           {data.dateStart && data.dateEnd
