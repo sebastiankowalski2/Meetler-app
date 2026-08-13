@@ -16,10 +16,12 @@ import {
 import { db } from '../firebase'
 import { useAuth } from '../context/useAuth'
 import AuthControls from '../components/AuthControls'
+import UserMenu from '../components/UserMenu'
 import AppHeader from '../components/AppHeader'
 import ConfirmDialog from '../components/ConfirmDialog'
 import CreateGroupDialog from '../components/CreateGroupDialog'
 import EventListCard from '../components/EventListCard'
+import GroupAvatar from '../components/GroupAvatar'
 import { toast } from 'react-hot-toast'
 import { isEventEnded } from '../utils/eventStatus'
 
@@ -277,7 +279,7 @@ export default function MyEventsPage() {
 
   return (
     <div className="min-h-full flex flex-col">
-      <AppHeader right={user ? <AuthControls compact /> : null} />
+      <AppHeader right={user ? <UserMenu avatarOnly /> : null} />
 
       <div className="items-center align-middle justify-center flex flex-col gap-6 pt-8 pb-16 px-4">
         <h1 className="font-display text-primary text-3xl sm:text-4xl font-extrabold">
@@ -320,50 +322,56 @@ export default function MyEventsPage() {
           <p className="font-bold">Loading your events...</p>
         )}
 
-        {user && tab === 'events' && !eventsLoading && sortedEvents.length === 0 && (
-          <p className="font-bold text-center max-w-sm">
-            No events yet. Create one, or open an invite link and set your
-            availability while signed in.
-          </p>
-        )}
+        {user &&
+          tab === 'events' &&
+          !eventsLoading &&
+          sortedEvents.length === 0 && (
+            <p className="font-bold text-center max-w-sm">
+              No events yet. Create one, or open an invite link and set your
+              availability while signed in.
+            </p>
+          )}
 
-        {user && tab === 'events' && !eventsLoading && sortedEvents.length > 0 && (
-          <div className="flex flex-col gap-3 w-full max-w-xl">
-            {sortedEvents.map(({ id, data, roles, ended }) => {
-              const isCreatorRole = roles.has('creator')
-              const isBusy = busyEventId === id
+        {user &&
+          tab === 'events' &&
+          !eventsLoading &&
+          sortedEvents.length > 0 && (
+            <div className="flex flex-col gap-3 w-full max-w-xl">
+              {sortedEvents.map(({ id, data, roles, ended }) => {
+                const isCreatorRole = roles.has('creator')
+                const isBusy = busyEventId === id
 
-              return (
-                <EventListCard
-                  key={id}
-                  id={id}
-                  data={data}
-                  ended={ended}
-                  badge={Array.from(roles)
-                    .map((role) =>
-                      role === 'creator' ? '👑 Creator' : '🙋 Participant',
-                    )
-                    .join(' · ')}
-                  cornerAction={
-                    isCreatorRole
-                      ? {
-                          icon: '🗑️',
-                          title: 'Delete event',
-                          disabled: isBusy,
-                          onClick: () => setPendingDelete({ id, data }),
-                        }
-                      : {
-                          icon: '✕',
-                          title: 'Remove from My Events',
-                          disabled: isBusy,
-                          onClick: () => setPendingLeave({ id, data }),
-                        }
-                  }
-                />
-              )
-            })}
-          </div>
-        )}
+                return (
+                  <EventListCard
+                    key={id}
+                    id={id}
+                    data={data}
+                    ended={ended}
+                    badge={Array.from(roles)
+                      .map((role) =>
+                        role === 'creator' ? '👑 Creator' : '🙋 Participant',
+                      )
+                      .join(' · ')}
+                    cornerAction={
+                      isCreatorRole
+                        ? {
+                            icon: '🗑️',
+                            title: 'Delete event',
+                            disabled: isBusy,
+                            onClick: () => setPendingDelete({ id, data }),
+                          }
+                        : {
+                            icon: '✕',
+                            title: 'Remove from My Events',
+                            disabled: isBusy,
+                            onClick: () => setPendingLeave({ id, data }),
+                          }
+                    }
+                  />
+                )
+              })}
+            </div>
+          )}
 
         {user && tab === 'groups' && (
           <div className="flex flex-col gap-3 w-full max-w-xl">
@@ -380,8 +388,8 @@ export default function MyEventsPage() {
 
             {!groupsLoading && groups.length === 0 && (
               <p className="font-bold text-center max-w-sm mx-auto">
-                No groups yet. Create one to organize recurring events with
-                the same people.
+                No groups yet. Create one to organize recurring events with the
+                same people.
               </p>
             )}
 
@@ -394,19 +402,25 @@ export default function MyEventsPage() {
                     backdropFilter: 'blur(10px)',
                     backgroundColor: 'rgba(255, 255, 255, 0.35)',
                   }}
-                  className="flex flex-col items-start gap-1 p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200"
+                  className="flex items-center gap-3 p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200"
                 >
-                  <span className="text-lg font-extrabold text-primary">
-                    👥 {data.name}
-                  </span>
-                  <span className="text-xs opacity-70">
-                    {memberCount} {memberCount === 1 ? 'member' : 'members'}
-                  </span>
-                  {data.ownerUid === user.uid && (
-                    <span className="text-xs font-bold text-primary">
-                      👑 Owner
+                  <GroupAvatar
+                    name={data.name}
+                    photoDataUrl={data.photoDataUrl}
+                  />
+                  <div className="flex flex-col items-start gap-1">
+                    <span className="text-lg font-extrabold text-primary">
+                      {data.name}
                     </span>
-                  )}
+                    <span className="text-xs opacity-70">
+                      {memberCount} {memberCount === 1 ? 'member' : 'members'}
+                    </span>
+                    {data.ownerUid === user.uid && (
+                      <span className="text-xs font-bold text-primary">
+                        👑 Owner
+                      </span>
+                    )}
+                  </div>
                 </Link>
               ))}
           </div>

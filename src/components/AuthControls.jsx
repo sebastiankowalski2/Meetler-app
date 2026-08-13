@@ -9,9 +9,17 @@ import { useAuth } from '../context/useAuth'
 // `showEditName`: exposes an inline editor for the *display name* only.
 // This never changes the account/uid - it's purely presentational, wired
 // through AuthContext.updateDisplayName.
-export default function AuthControls({ compact = false, showEditName = false }) {
-  const { user, authLoading, signInWithGoogle, signOutUser, updateDisplayName } =
-    useAuth()
+export default function AuthControls({
+  compact = false,
+  showEditName = false,
+}) {
+  const {
+    user,
+    authLoading,
+    signInWithGoogle,
+    signOutUser,
+    updateDisplayName,
+  } = useAuth()
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
 
@@ -45,9 +53,9 @@ export default function AuthControls({ compact = false, showEditName = false }) 
 
   return (
     <div
-      className={`flex ${compact ? 'flex-row items-center gap-2' : 'flex-col items-start gap-2'}`}
+      className={`flex w-full ${compact ? 'flex-row items-center gap-2' : 'flex-col items-start gap-3'}`}
     >
-      <div className="flex items-center gap-2">
+      <div className="rounded-2xl p-2 w-full bg-secondary flex items-center gap-2">
         {user.photoURL && (
           <img
             src={user.photoURL}
@@ -56,39 +64,39 @@ export default function AuthControls({ compact = false, showEditName = false }) 
             className="w-6 h-6 rounded-full border border-white"
           />
         )}
-        <span className="text-sm font-bold truncate max-w-32">
+        <span className=" text-sm font-bold truncate max-w-32">
           {user.displayName || user.email}
         </span>
       </div>
 
       {showEditName &&
         (editingName ? (
-          <form onSubmit={saveName} className="flex items-center gap-1">
+          <form onSubmit={saveName} className="flex items-center gap-2">
             <input
               autoFocus
-              className="bg-white text-black text-sm p-1 rounded w-32"
+              className="bg-white border border-black text-black text-sm p-1 rounded-sm w-28"
               value={nameDraft}
               onChange={(e) => setNameDraft(e.target.value)}
               maxLength={30}
             />
             <button
               type="submit"
-              className="text-xs font-bold text-primary hover:underline cursor-pointer"
+              className="text-sm font-bold p-1 transition-colors hover:bg-secondary rounded-3xl cursor-pointer"
             >
-              Save
+              ✅
             </button>
             <button
               type="button"
               onClick={() => setEditingName(false)}
-              className="text-xs font-bold opacity-70 hover:underline cursor-pointer"
+              className="text-sm font-bold p-1 transition-colors hover:bg-secondary rounded-2xl cursor-pointer"
             >
-              Cancel
+              ❌
             </button>
           </form>
         ) : (
           <button
             onClick={startEditing}
-            className="text-xs font-bold text-primary hover:underline cursor-pointer"
+            className="text-sm font-bold p-1 text-primary hover:underline cursor-pointer"
           >
             ✏️ Edit display name
           </button>
@@ -96,15 +104,15 @@ export default function AuthControls({ compact = false, showEditName = false }) 
 
       <Link
         to="/my-events"
-        className="text-sm font-bold text-primary hover:underline"
+        className="text-sm font-bold p-1 text-primary hover:underline"
       >
         📅 My Events
       </Link>
       <button
         onClick={signOutUser}
-        className="text-sm font-bold text-red-600 hover:underline cursor-pointer"
+        className="text-sm font-bold w-full text-red-600 p-2 transition-colors bg-red-100 hover:bg-red-300 rounded-2xl cursor-pointer"
       >
-        Sign out
+        <span className="text-black"></span> Sign out
       </button>
     </div>
   )

@@ -77,11 +77,11 @@ export default function EventForm({ mClicked, groupId = null, onCreated }) {
         className={`relative flex items-center justify-center align-middle duration-200`}
       >
         <div
-          style={{
-            backdropFilter: 'blur(20px)',
-            backgroundColor: 'rgba(255, 255, 255, 0.25)',
-          }}
-          className={`form-group sm:w-95 w-88 items-center border-10 border-primary bg-secondary text-black flex flex-col p-2 pt-4 rounded-3xl gap-2 transition-all duration-250 ${mClicked ? 'rotate-3' : ''}`}
+          // style={{
+          //   backdropFilter: 'blur(20px)',
+          //   backgroundColor: 'rgba(255, 255, 255, 0.25)',
+          // }}
+          className={`form-group sm:w-95 w-88 items-center border-10 border-primary bg-gray-300 text-black flex flex-col p-2 pt-4 rounded-3xl gap-2 transition-all duration-250 ${mClicked ? 'rotate-3' : ''}`}
         >
           <form onSubmit={handleSubmit}>
             <div className="w-75">
@@ -89,7 +89,7 @@ export default function EventForm({ mClicked, groupId = null, onCreated }) {
                 Event Name:
               </label>
               <input
-                className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250 bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary cursor-pointer`}
+                className={`${mClicked ? 'rotate-2' : 'rotate-0'} transition-all duration-250 border-primary border bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary cursor-pointer`}
                 type="text"
                 placeholder="Birthday Party, Conference, etc."
                 id="eventName"
@@ -106,7 +106,7 @@ export default function EventForm({ mClicked, groupId = null, onCreated }) {
                   Location:{' '}
                 </label>
                 <input
-                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
+                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 border-primary border rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
                   type="text"
                   placeholder="Bill's House, Central Park, etc."
                   id="eventLocation"
@@ -124,7 +124,7 @@ export default function EventForm({ mClicked, groupId = null, onCreated }) {
                   Start Date:{' '}
                 </label>
                 <input
-                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
+                  className={`${mClicked ? '-rotate-1' : 'rotate-0'} bg-white mt-1 border-primary border p-2 rounded-lg w-full mb-2 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
                   min={today}
                   type="date"
                   id="dateStart"
@@ -142,7 +142,7 @@ export default function EventForm({ mClicked, groupId = null, onCreated }) {
                   End Date:{' '}
                 </label>
                 <input
-                  className={`${mClicked ? 'rotate-3' : 'rotate-0'} bg-white mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
+                  className={`${mClicked ? 'rotate-3' : 'rotate-0'} bg-white border-primary border mt-1 p-2 rounded-lg w-full mb-4 active:outline-primary focus:outline-primary transition-all duration-250 cursor-pointer`}
                   min={today}
                   type="date"
                   id="dateEnd"
@@ -153,12 +153,14 @@ export default function EventForm({ mClicked, groupId = null, onCreated }) {
                 />
               </div>
             </div>
-            <button
-              className={`${mClicked ? 'rotate-6' : 'rotate-0'} bg-primary text-2xl m-3 text-white cursor-pointer rounded-2xl p-2.5 hover:bg-primary-hover transition-all duration-250 hover:shadow-sm hover:shadow-blue-950`}
-              type="submit"
-            >
-              Create Event
-            </button>
+            <div className={`transition-all duration-250 flex justify-center`}>
+              <button
+                className={`${mClicked ? 'rotate-6' : 'rotate-0'} bg-primary text-2xl m-3 text-white cursor-pointer rounded-2xl p-2.5 hover:bg-primary-hover transition-all duration-250 hover:shadow-sm hover:shadow-blue-950`}
+                type="submit"
+              >
+                Create Event
+              </button>
+            </div>
           </form>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   doc,
@@ -8,22 +8,27 @@ import {
   query,
   where,
   deleteDoc,
+  updateDoc,
 } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useAuth } from '../context/useAuth'
 import AppHeader from '../components/AppHeader'
-import AuthControls from '../components/AuthControls'
+import UserMenu from '../components/UserMenu'
 import LoginRequired from '../components/LoginRequired'
 import ConfirmDialog from '../components/ConfirmDialog'
+import Modal from '../components/Modal'
 import EventListCard from '../components/EventListCard'
 import EventForm from '../components/EventForm'
+import GroupAvatar from '../components/GroupAvatar'
 import { toast } from 'react-hot-toast'
 import { isEventEnded } from '../utils/eventStatus'
+import { resizeImageToDataUrl } from '../utils/imageResize'
 
 export default function GroupPage() {
   const { groupId } = useParams()
   const { user, authLoading } = useAuth()
   const navigate = useNavigate()
+  const photoInputRef = useRef(null)
 
   const [group, setGroup] = useState(null)
   const [members, setMembers] = useState([])
@@ -34,6 +39,10 @@ export default function GroupPage() {
   const [pendingLeaveGroup, setPendingLeaveGroup] = useState(false)
   const [pendingDeleteGroup, setPendingDeleteGroup] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [editingName, setEditingName] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
+  const [savingName, setSavingName] = useState(false)
 
   const isOwner = !!user && group?.ownerUid === user.uid
 
@@ -168,6 +177,52 @@ export default function GroupPage() {
     }
   }
 
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // allow re-selecting the same file later
+    if (!file || !isOwner) return
+
+    setUploadingPhoto(true)
+    try {
+      const photoDataUrl = await resizeImageToDataUrl(file)
+      await updateDoc(doc(db, 'groups', groupId), { photoDataUrl })
+      setGroup((prev) => ({ ...prev, photoDataUrl }))
+      toast.success('Group photo updated!')
+    } catch (error) {
+      console.error('Failed to update group photo:', error)
+      toast.error(error.message || 'Could not update the group photo.')
+    } finally {
+      setUploadingPhoto(false)
+    }
+  }
+
+  const startEditingName = () => {
+    setNameDraft(group?.name || '')
+    setEditingName(true)
+  }
+
+  const saveName = async (e) => {
+    e.preventDefault()
+    const trimmed = nameDraft.trim()
+    if (!trimmed || trimmed === group?.name) {
+      setEditingName(false)
+      return
+    }
+
+    setSavingName(true)
+    try {
+      await updateDoc(doc(db, 'groups', groupId), { name: trimmed })
+      setGroup((prev) => ({ ...prev, name: trimmed }))
+      toast.success('Group renamed.')
+      setEditingName(false)
+    } catch (error) {
+      console.error('Failed to rename group:', error)
+      toast.error('Could not rename the group.')
+    } finally {
+      setSavingName(false)
+    }
+  }
+
   if (!authLoading && !user) {
     return (
       <div className="min-h-full flex flex-col">
@@ -181,7 +236,7 @@ export default function GroupPage() {
 
   return (
     <div className="min-h-full flex flex-col">
-      <AppHeader right={<AuthControls compact />} />
+      <AppHeader right={<UserMenu avatarOnly />} />
 
       <div className="flex flex-col items-center gap-6 pt-8 pb-16 px-4">
         {(authLoading || loading) && (
@@ -190,10 +245,74 @@ export default function GroupPage() {
 
         {!loading && group && (
           <>
-            <div className="flex flex-col items-center gap-1 text-center">
-              <h1 className="font-display text-primary text-3xl sm:text-4xl font-extrabold">
-                👥 {group.name}
-              </h1>
+            <div className="flex flex-col items-center gap-2 text-center">
+              <div className="relative">
+                <GroupAvatar
+                  name={group.name}
+                  photoDataUrl={group.photoDataUrl}
+                  size="w-20 h-20 text-2xl"
+                />
+                {isOwner && (
+                  <button
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={uploadingPhoto}
+                    title="Change group photo"
+                    className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-sm shadow-md hover:bg-primary-hover transition-colors duration-150 cursor-pointer disabled:opacity-60"
+                  >
+                    {uploadingPhoto ? '…' : '📷'}
+                  </button>
+                )}
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+              </div>
+
+              {editingName ? (
+                <form
+                  onSubmit={saveName}
+                  className="flex items-center gap-2 mt-1"
+                >
+                  <input
+                    autoFocus
+                    value={nameDraft}
+                    onChange={(e) => setNameDraft(e.target.value)}
+                    maxLength={50}
+                    className="rounded-xl border border-slate-300 px-3 py-1.5 text-lg font-extrabold text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                  <button
+                    type="submit"
+                    disabled={savingName}
+                    className="text-sm font-bold text-primary hover:underline cursor-pointer"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingName(false)}
+                    className="text-sm font-bold opacity-60 hover:underline cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </form>
+              ) : (
+                <h1 className="font-display text-primary text-3xl sm:text-4xl font-extrabold flex items-center gap-2">
+                  {group.name}
+                  {isOwner && (
+                    <button
+                      onClick={startEditingName}
+                      title="Rename group"
+                      className="text-lg opacity-60 hover:opacity-100 cursor-pointer"
+                    >
+                      ✏️
+                    </button>
+                  )}
+                </h1>
+              )}
+
               <p className="text-sm opacity-70">
                 {members.length} {members.length === 1 ? 'member' : 'members'}
                 {isOwner && ' · 👑 you own this group'}
@@ -266,14 +385,12 @@ export default function GroupPage() {
                 Events in this group
               </h2>
               <button
-                onClick={() => setShowCreateEvent((v) => !v)}
+                onClick={() => setShowCreateEvent(true)}
                 className="rounded-xl bg-primary text-white text-sm font-bold px-3 py-1.5 hover:bg-primary-hover transition-colors duration-150 cursor-pointer"
               >
-                {showCreateEvent ? 'Cancel' : '+ New event'}
+                + New event
               </button>
             </div>
-
-            {showCreateEvent && <EventForm groupId={groupId} />}
 
             {sortedEvents.length === 0 && (
               <p className="font-bold text-center max-w-sm opacity-80">
@@ -298,6 +415,14 @@ export default function GroupPage() {
           </>
         )}
       </div>
+
+      <Modal
+        open={showCreateEvent}
+        title="New event"
+        onClose={() => setShowCreateEvent(false)}
+      >
+        <EventForm groupId={groupId} />
+      </Modal>
 
       <ConfirmDialog
         open={!!pendingRemoveMember}

@@ -6,7 +6,7 @@ import WebImage from '../assets/web.png'
 // on small screens no matter how much is in the right slot.
 export default function AppHeader({ onLogoClick, spin = false, right }) {
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between gap-2 px-3 sm:px-6 py-2.5 backdrop-blur-md bg-white/50 border-b border-white/60 shadow-[0_1px_0_rgba(0,0,0,0.03)]">
+    <header className="sticky top-0 z-30 flex items-center justify-between gap-6 sm:gap-40 px-3 sm:px-6 py-2.5 backdrop-blur-md bg-white/50 border-b border-white/60 shadow-[0_1px_0_rgba(0,0,0,0.03)]">
       <Link
         to="/"
         onClick={onLogoClick}

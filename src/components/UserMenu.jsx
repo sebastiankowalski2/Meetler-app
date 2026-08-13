@@ -5,7 +5,10 @@ import AuthControls from './AuthControls'
 // "Who am I" menu, meant to sit inside AppHeader's right slot. Positioned
 // relative to its own trigger button (not the viewport), so it can never
 // overlap other header content.
-export default function UserMenu({ isCreator = false }) {
+//
+// `avatarOnly`: collapses the trigger to just a (larger) round photo, no
+// name label - used on the home page where the header should stay minimal.
+export default function UserMenu({ isCreator = false, avatarOnly = false }) {
   const { user, authLoading } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef(null)
@@ -34,15 +37,20 @@ export default function UserMenu({ isCreator = false }) {
   }
 
   const label = user.displayName || user.email || 'Account'
+  const avatarSize = avatarOnly ? 'w-9 h-9 sm:w-10 sm:h-10' : 'w-6 h-6'
 
   return (
     <div className="relative" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 rounded-full bg-primary text-white pl-1.5 pr-2.5 sm:pr-3 py-1 font-bold text-sm cursor-pointer hover:bg-primary-hover transition-colors duration-150"
+        title={label}
+        className={`flex items-center gap-1 rounded-full bg-primary text-white cursor-pointer hover:bg-primary-hover transition-colors duration-150 ${avatarOnly ? 'p-0.5' : 'pl-1.5 pr-2.5 sm:pr-3 py-1 font-bold text-sm'}`}
       >
         {isCreator && (
-          <span title="You created this event" className="text-base leading-none">
+          <span
+            title="You created this event"
+            className="leading-none sm:text-xl pl-2"
+          >
             👑
           </span>
         )}
@@ -51,16 +59,20 @@ export default function UserMenu({ isCreator = false }) {
             src={user.photoURL}
             alt=""
             referrerPolicy="no-referrer"
-            className="w-6 h-6 rounded-full border border-white/70"
+            className={`${avatarSize} rounded-full border border-white/70`}
           />
         ) : (
-          <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">
+          <span
+            className={`${avatarSize} rounded-full bg-white/20 flex items-center justify-center text-xs`}
+          >
             {label.slice(0, 1).toUpperCase()}
           </span>
         )}
-        <span className="hidden xs:inline max-w-24 sm:max-w-32 truncate">
-          {label}
-        </span>
+        {!avatarOnly && (
+          <span className="hidden xs:inline max-w-24 sm:max-w-32 truncate">
+            {label}
+          </span>
+        )}
       </button>
 
       <div

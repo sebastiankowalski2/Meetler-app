@@ -1,6 +1,6 @@
 import EventForm from '../components/EventForm'
 import HowItWorks from '../components/HowItWorks'
-import AuthControls from '../components/AuthControls'
+import UserMenu from '../components/UserMenu'
 import AppHeader from '../components/AppHeader'
 import { useState } from 'react'
 
@@ -13,18 +13,22 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="items-center align-middle justify-center flex flex-col gap-4 eventFormStyle">
+    <div className="items-center align-middle justify-center flex flex-col sm:gap-12 gap-4 eventFormStyle">
       <AppHeader
         onLogoClick={handleMClick}
         spin={mClicked}
-        right={<AuthControls compact />}
+        right={
+          <>
+            <HowItWorks EventPage={true} />
+            <UserMenu avatarOnly />
+          </>
+        }
       />
 
       <h1 className="text-primary font-display text-2xl sm:text-3xl font-extrabold text-center px-4 mt-4">
         Find a time that works for everyone.
       </h1>
 
-      <HowItWorks EventPage={true} />
       <div
         style={{
           position: 'relative',

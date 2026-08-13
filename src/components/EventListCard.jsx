@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom'
 
-export default function EventListCard({ id, data, ended, badge, cornerAction }) {
+export default function EventListCard({
+  id,
+  data,
+  ended,
+  badge,
+  cornerAction,
+}) {
   return (
     <div
       style={{
@@ -19,7 +25,7 @@ export default function EventListCard({ id, data, ended, badge, cornerAction }) 
           {data.eventName}
         </span>
         {data.eventLocation && (
-          <span className="text-sm">🗺️ {data.eventLocation}</span>
+          <span className="text-sm">🏠 {data.eventLocation}</span>
         )}
         <span className="text-xs opacity-70">
           {data.dateStart && data.dateEnd

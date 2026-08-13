@@ -4,7 +4,9 @@ import { doc, getDoc, setDoc, collection, getDocs, serverTimestamp } from 'fireb
 import { db } from '../firebase'
 import { useAuth } from '../context/useAuth'
 import AppHeader from '../components/AppHeader'
+import UserMenu from '../components/UserMenu'
 import LoginRequired from '../components/LoginRequired'
+import GroupAvatar from '../components/GroupAvatar'
 import { toast } from 'react-hot-toast'
 
 export default function JoinGroupPage() {
@@ -84,7 +86,7 @@ export default function JoinGroupPage() {
 
   return (
     <div className="min-h-full flex flex-col">
-      <AppHeader />
+      <AppHeader right={user ? <UserMenu /> : null} />
 
       <div className="flex-1 flex items-center justify-center p-6">
         {!authLoading && !user && (
@@ -107,6 +109,11 @@ export default function JoinGroupPage() {
             }}
             className="flex flex-col items-center gap-4 p-6 rounded-2xl shadow-lg text-center max-w-sm"
           >
+            <GroupAvatar
+              name={group.name}
+              photoDataUrl={group.photoDataUrl}
+              size="w-16 h-16 text-xl"
+            />
             <p className="font-display text-xl font-extrabold text-primary">
               Join "{group.name}"?
             </p>

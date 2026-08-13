@@ -17,7 +17,8 @@ export default function EventView({ eventData, eventId }) {
   const [participants, setParticipants] = useState([])
 
   const eventEnded = isEventEnded(eventData)
-  const isCreator = !!user && !!eventData?.createdBy && eventData.createdBy === user.uid
+  const isCreator =
+    !!user && !!eventData?.createdBy && eventData.createdBy === user.uid
 
   // A signed-out visitor, or anyone once the event has ended, can only
   // view the event - editing availability is a protected, per-user action.
@@ -158,12 +159,13 @@ export default function EventView({ eventData, eventId }) {
       <AppHeader
         right={
           <>
+            <HowItWorks EventView={true} />
             <ParticipantsDropdown
               participants={participants}
               eventId={eventId}
               isCreator={isCreator}
             />
-            <UserMenu isCreator={isCreator} />
+            <UserMenu avatarOnly isCreator={isCreator} />
           </>
         }
       />
@@ -182,8 +184,6 @@ export default function EventView({ eventData, eventId }) {
           </Link>
         </div>
       )}
-
-      <HowItWorks EventView={true} />
 
       <div
         style={{
@@ -218,23 +218,23 @@ export default function EventView({ eventData, eventId }) {
         </div>
         <div className="px-5 max-w-88 sm:max-w-200 items-center rounded-2xl flex flex-col gap-4">
           <div className="mt-5 justify-center flex align-middle items-center">
-            <span className="text-md md:text-2xl lg:text-4xl pr-1">🏷️</span>
-            <h2 className="text-md font-extrabold md:text-2xl lg:text-2xl pr-2 pl-2 text-primary inset-shadow-sm shadow-sm">
+            <span className="text-md md:text-2xl lg:text-4xl pr-1"></span>
+            <h2 className="text-2xl font-extrabold md:text-2xl lg:text-3xl pr-2 pl-2 text-primary inset-shadow-sm shadow-sm">
               {eventData.eventName.toUpperCase()}
             </h2>
-            <span className="text-md md:text-2xl lg:text-4xl pl-1">🏷️</span>
+            <span className="text-md md:text-2xl lg:text-4xl pl-1"></span>
           </div>
 
           {eventData.eventLocation && (
             <div className="mb-1 justify-center flex align-middle items-center">
               <span className="text-md md:text-xl lg:text-2xl pb-2 pr-1">
-                🗺️
+                🏠
               </span>
               <h2 className="text-md md:text-xl lg:text-xl mb-4 mt-2 pr-2 pl-2 text-secondary bg-primary inset-shadow-sm shadow-sm font-bold">
                 {eventData.eventLocation.toUpperCase()}
               </h2>
               <span className="text-md md:text-xl lg:text-2xl pb-2 pl-1">
-                🗺️
+                🏠
               </span>
             </div>
           )}
