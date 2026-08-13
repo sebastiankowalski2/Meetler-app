@@ -281,21 +281,21 @@ export default function GroupPage() {
                     value={nameDraft}
                     onChange={(e) => setNameDraft(e.target.value)}
                     maxLength={50}
-                    className="rounded-xl border border-slate-300 px-3 py-1.5 text-lg font-extrabold text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="rounded-xl border border-black px-0 py-1.5 text-lg font-extrabold text-primary text-center focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                   <button
                     type="submit"
                     disabled={savingName}
-                    className="text-sm font-bold text-primary hover:underline cursor-pointer"
+                    className="text-md font-bold text-primary cursor-pointer p-1 transition-colors hover:bg-secondary rounded-3xl"
                   >
-                    Save
+                    ✅
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditingName(false)}
-                    className="text-sm font-bold opacity-60 hover:underline cursor-pointer"
+                    className="text-md font-bold p-1 transition-colors hover:bg-secondary cursor-pointer rounded-3xl"
                   >
-                    Cancel
+                    ❌
                   </button>
                 </form>
               ) : (

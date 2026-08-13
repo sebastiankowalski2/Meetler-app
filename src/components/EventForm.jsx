@@ -81,10 +81,10 @@ export default function EventForm({ mClicked, groupId = null, onCreated }) {
           //   backdropFilter: 'blur(20px)',
           //   backgroundColor: 'rgba(255, 255, 255, 0.25)',
           // }}
-          className={`form-group sm:w-95 w-88 items-center border-10 border-primary bg-gray-300 text-black flex flex-col p-2 pt-4 rounded-3xl gap-2 transition-all duration-250 ${mClicked ? 'rotate-3' : ''}`}
+          className={`form-group sm:w-95 w-80 items-center border-10 border-primary bg-gray-300 text-black flex flex-col p-2 pt-4 rounded-3xl gap-2 transition-all duration-250 ${mClicked ? 'rotate-3' : ''}`}
         >
           <form onSubmit={handleSubmit}>
-            <div className="w-75">
+            <div className="w-70">
               <label className="font-bold" htmlFor="eventName">
                 Event Name:
               </label>
