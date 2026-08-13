@@ -15,6 +15,12 @@ function App() {
         position="top-center"
         toastOptions={{
           className: 'meetler-toast',
+          style: {
+            fontStyle: 'extra-bold',
+          },
+          iconTheme: {
+            primary: 'var(--color-primary)',
+          },
         }}
       />
       <Routes>

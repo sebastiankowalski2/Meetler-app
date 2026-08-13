@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, onSnapshot } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useEffect, useState } from 'react'
 import EventView from '../components/EventView'
@@ -12,18 +12,21 @@ export default function EventPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchEvent = async () => {
-      const docRef = doc(db, 'events', eventId)
-      const docSnap = await getDoc(docRef)
+    const docRef = doc(db, 'events', eventId)
 
-      if (docSnap.exists()) {
-        setEventData(docSnap.data())
-      }
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        setEventData(docSnap.exists() ? docSnap.data() : null)
+        setLoading(false)
+      },
+      (error) => {
+        console.error('Failed to load event:', error)
+        setLoading(false)
+      },
+    )
 
-      setLoading(false)
-    }
-
-    fetchEvent()
+    return () => unsubscribe()
   }, [eventId])
 
   if (loading)

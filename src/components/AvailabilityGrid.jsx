@@ -16,6 +16,9 @@ export default function AvailabilityGrid({
   eventId,
   selectedDates,
   setSelectedDates,
+  isCreator = false,
+  confirmedDate = null,
+  onConfirmDate,
 }) {
   const [firstClick, setFirstClick] = useState(false)
   const { user, authLoading } = useAuth()
@@ -134,10 +137,78 @@ export default function AvailabilityGrid({
   const scores = Object.values(scoreMap)
   const maxScore = Math.max(...scores, 0)
 
+  const topDates = Object.entries(scoreMap)
+    .filter(([, score]) => score > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+
+  const formatDate = (dateString) =>
+    parseDateString(dateString).toLocaleDateString('en-EN', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    })
+
   return (
     <>
+      {participantsCount > 1 &&
+        isCreator &&
+        !eventEnded &&
+        !confirmedDate &&
+        topDates.length > 0 && (
+          <div className="flex flex-col items-center justify-center mb-6">
+            <div
+              style={{
+                backdropFilter: 'blur(10px)',
+                backgroundColor: 'rgba(255, 255, 255, 0.35)',
+              }}
+              className="mb-6 w-full max-w-md rounded-2xl shadow-md p-4"
+            >
+              <h3 className="font-display font-extrabold text-primary mb-2">
+                🏆 Pick the final date
+              </h3>
+              <ul className="flex flex-col gap-1.5">
+                {topDates.map(([date, score]) => (
+                  <li
+                    key={date}
+                    className="flex items-center justify-between gap-2 rounded-lg bg-white/50 px-3 py-2 text-sm font-bold"
+                  >
+                    <span>
+                      {formatDate(date)} -{' '}
+                      <span
+                        className={
+                          participantsCount - score > 0
+                            ? 'inline-flex items-center rounded-full bg-red-50 px-1.5 py-0.5 font-bold text-red-600 ring-1 ring-red-200 shadow-sm'
+                            : 'inline-flex items-center rounded-full bg-amber-100/90 px-1.5 py-0.5 font-bold text-yellow-600 ring-1 ring-amber-300 shadow-sm'
+                        }
+                      >
+                        {score}/{participantsCount}
+                      </span>{' '}
+                      available
+                    </span>
+                    <button
+                      onClick={() => onConfirmDate?.(date)}
+                      className={
+                        participantsCount - score > 0
+                          ? 'rounded-lg bg-primary text-white text-xs font-bold px-2.5 py-1.5 hover:bg-primary-hover transition-colors duration-150 cursor-pointer'
+                          : 'rounded-lg bg-yellow-500 text-white text-xs font-bold px-2.5 py-1.5 hover:bg-yellow-600 transition-colors duration-150 cursor-pointer'
+                      }
+                    >
+                      Confirm
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
       {authLoading ? (
         <p className="mb-4 font-bold opacity-70">Checking your session…</p>
+      ) : confirmedDate ? (
+        <p className="mb-6 font-bold text-amber-900 bg-amber-50 border border-amber-200 backdrop-blur-md rounded-xl px-4 py-3 inline-block">
+          🏆 Final date confirmed - availability is locked.
+        </p>
       ) : eventEnded ? (
         <p className="mb-6 font-bold text-slate-600 bg-white/40 backdrop-blur-md rounded-xl px-4 py-3 inline-block">
           This event has ended, so availability can no longer be edited.
@@ -205,6 +276,8 @@ export default function AvailabilityGrid({
                     maxScore={maxScore}
                     participantsCount={participantsCount}
                     isGuest={isGuest}
+                    isLocked={!!confirmedDate}
+                    isConfirmed={confirmedDate === date}
                     key={index}
                     propDate={date}
                     index={index}

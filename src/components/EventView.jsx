@@ -1,6 +1,13 @@
 import AvailabilityGrid from '../components/AvailabilityGrid'
 import { useState, useEffect, useMemo } from 'react'
-import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
+  deleteField,
+} from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 import { Link } from 'react-router-dom'
@@ -8,8 +15,10 @@ import ParticipantsDropdown from './ParticipantsDropdown'
 import HowItWorks from './HowItWorks'
 import UserMenu from './UserMenu'
 import AppHeader from './AppHeader'
+import EditEventModal from './EditEventModal'
 import { useAuth } from '../context/useAuth'
 import { isEventEnded } from '../utils/eventStatus'
+import { googleCalendarLink } from '../utils/googleCalendar'
 
 export default function EventView({ eventData, eventId }) {
   const { user, authLoading } = useAuth()
@@ -19,10 +28,38 @@ export default function EventView({ eventData, eventId }) {
   const eventEnded = isEventEnded(eventData)
   const isCreator =
     !!user && !!eventData?.createdBy && eventData.createdBy === user.uid
+  const confirmedDate = eventData?.confirmedDate || null
+  const [showEditEvent, setShowEditEvent] = useState(false)
 
   // A signed-out visitor, or anyone once the event has ended, can only
   // view the event - editing availability is a protected, per-user action.
   const isGuest = !user || eventEnded
+
+  const confirmDate = async (date) => {
+    try {
+      await updateDoc(doc(db, 'events', eventId), {
+        confirmedDate: date,
+        confirmedAt: new Date(),
+      })
+      toast.success('Final date confirmed! 🏆')
+    } catch (error) {
+      console.error('Failed to confirm date:', error)
+      toast.error('Could not confirm this date.')
+    }
+  }
+
+  const unconfirmDate = async () => {
+    try {
+      await updateDoc(doc(db, 'events', eventId), {
+        confirmedDate: deleteField(),
+        confirmedAt: deleteField(),
+      })
+      toast.success('Confirmation removed. Availability is open again.')
+    } catch (error) {
+      console.error('Failed to unconfirm date:', error)
+      toast.error('Could not undo the confirmation.')
+    }
+  }
 
   useEffect(() => {
     if (!eventData?.eventName) return
@@ -170,19 +207,56 @@ export default function EventView({ eventData, eventId }) {
         }
       />
 
-      {eventEnded && (
-        <div className="mx-4 sm:mx-0 mt-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 px-5 py-4 flex flex-col sm:flex-row items-center gap-3 justify-center text-center sm:text-left">
-          <span className="text-2xl">⏳</span>
+      {confirmedDate ? (
+        <div className="mx-4 sm:mx-0 mt-6 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 px-5 py-4 flex flex-col sm:flex-row items-center gap-3 justify-center text-center sm:text-left">
+          <span className="text-2xl">🏆</span>
           <p className="font-bold">
-            This event has ended. Want to plan the next one?
+            Final date:{' '}
+            {(() => {
+              const [y, m, d] = confirmedDate.split('-').map(Number)
+              return new Date(y, m - 1, d).toLocaleDateString('en-EN', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+              })
+            })()}
           </p>
-          <Link
-            to="/"
+          <a
+            href={googleCalendarLink({
+              eventName: eventData.eventName,
+              eventLocation: eventData.eventLocation,
+              confirmedDate,
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
             className="rounded-xl bg-primary text-white text-sm font-bold px-4 py-2 hover:bg-primary-hover transition-colors duration-150"
           >
-            Create a new event
-          </Link>
+            📅 Add to Google Calendar
+          </a>
+          {isCreator && (
+            <button
+              onClick={unconfirmDate}
+              className="text-sm font-bold text-amber-900/70 hover:underline cursor-pointer"
+            >
+              Change date
+            </button>
+          )}
         </div>
+      ) : (
+        eventEnded && (
+          <div className="mx-4 sm:mx-0 mt-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 px-5 py-4 flex flex-col sm:flex-row items-center gap-3 justify-center text-center sm:text-left">
+            <span className="text-2xl">⏳</span>
+            <p className="font-bold">
+              This event has ended. Want to plan the next one?
+            </p>
+            <Link
+              to="/"
+              className="rounded-xl bg-primary text-white text-sm font-bold px-4 py-2 hover:bg-primary-hover transition-colors duration-150"
+            >
+              Create a new event
+            </Link>
+          </div>
+        )
       )}
 
       <div
@@ -217,12 +291,19 @@ export default function EventView({ eventData, eventId }) {
           </button>
         </div>
         <div className="px-5 max-w-88 sm:max-w-200 items-center rounded-2xl flex flex-col gap-4">
-          <div className="mt-5 justify-center flex align-middle items-center">
-            <span className="text-md md:text-2xl lg:text-4xl pr-1"></span>
+          <div className="mt-5 justify-center flex align-middle items-center gap-2">
             <h2 className="text-2xl font-extrabold md:text-2xl lg:text-3xl pr-2 pl-2 text-primary inset-shadow-sm shadow-sm">
               {eventData.eventName.toUpperCase()}
             </h2>
-            <span className="text-md md:text-2xl lg:text-4xl pl-1"></span>
+            {isCreator && !eventEnded && (
+              <button
+                onClick={() => setShowEditEvent(true)}
+                title="Edit event"
+                className="text-lg opacity-60 hover:opacity-100 cursor-pointer"
+              >
+                ✏️
+              </button>
+            )}
           </div>
 
           {eventData.eventLocation && (
@@ -252,7 +333,20 @@ export default function EventView({ eventData, eventId }) {
         eventId={eventId}
         selectedDates={selectedDates}
         setSelectedDates={setSelectedDates}
+        isCreator={isCreator}
+        confirmedDate={confirmedDate}
+        onConfirmDate={confirmDate}
       />
+
+      {showEditEvent && (
+        <EditEventModal
+          open={showEditEvent}
+          onClose={() => setShowEditEvent(false)}
+          eventId={eventId}
+          eventData={eventData}
+          datesLocked={!!confirmedDate}
+        />
+      )}
     </div>
   )
 }

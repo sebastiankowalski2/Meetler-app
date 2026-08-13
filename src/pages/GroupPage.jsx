@@ -38,6 +38,9 @@ export default function GroupPage() {
   const [pendingRemoveMember, setPendingRemoveMember] = useState(null)
   const [pendingLeaveGroup, setPendingLeaveGroup] = useState(false)
   const [pendingDeleteGroup, setPendingDeleteGroup] = useState(false)
+  const [pendingDeleteEvent, setPendingDeleteEvent] = useState(null) // { id, data } | null
+  const [pendingLeaveEvent, setPendingLeaveEvent] = useState(null) // { id, data } | null
+  const [busyEventId, setBusyEventId] = useState(null)
   const [busy, setBusy] = useState(false)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [editingName, setEditingName] = useState(false)
@@ -78,10 +81,29 @@ export default function GroupPage() {
           query(collection(db, 'events'), where('groupId', '==', groupId)),
         )
 
+        const eventsWithRoles = await Promise.all(
+          eventsSnap.docs.map(async (eventDoc) => {
+            const data = eventDoc.data()
+            const roles = new Set()
+            if (data.createdBy === user.uid) roles.add('creator')
+
+            try {
+              const participantSnap = await getDoc(
+                doc(db, 'events', eventDoc.id, 'participants', user.uid),
+              )
+              if (participantSnap.exists()) roles.add('participant')
+            } catch {
+              // Non-fatal: just skip the participant badge for this event.
+            }
+
+            return { id: eventDoc.id, data, roles }
+          }),
+        )
+
         if (!cancelled) {
           setGroup(groupSnap.data())
           setMembers(memberList)
-          setEvents(eventsSnap.docs.map((d) => ({ id: d.id, data: d.data() })))
+          setEvents(eventsWithRoles)
         }
       } catch (error) {
         console.error('Failed to load group:', error)
@@ -111,6 +133,45 @@ export default function GroupPage() {
       .sort((a, b) => byEndDateAsc(b, a))
     return [...upcoming, ...ended]
   }, [events])
+
+  const deleteEventCompletely = async () => {
+    if (!pendingDeleteEvent) return
+    const { id } = pendingDeleteEvent
+    setBusyEventId(id)
+    try {
+      const participantsSnap = await getDocs(
+        collection(db, 'events', id, 'participants'),
+      )
+      await Promise.all(participantsSnap.docs.map((p) => deleteDoc(p.ref)))
+      await deleteDoc(doc(db, 'events', id))
+
+      setEvents((prev) => prev.filter((e) => e.id !== id))
+      toast.success('Event deleted.')
+    } catch (error) {
+      console.error('Failed to delete event:', error)
+      toast.error('Could not delete this event.')
+    } finally {
+      setBusyEventId(null)
+      setPendingDeleteEvent(null)
+    }
+  }
+
+  const leaveEvent = async () => {
+    if (!pendingLeaveEvent || !user) return
+    const { id } = pendingLeaveEvent
+    setBusyEventId(id)
+    try {
+      await deleteDoc(doc(db, 'events', id, 'participants', user.uid))
+      setEvents((prev) => prev.filter((e) => e.id !== id))
+      toast.success('You left this event.')
+    } catch (error) {
+      console.error('Failed to leave event:', error)
+      toast.error('Could not remove your availability.')
+    } finally {
+      setBusyEventId(null)
+      setPendingLeaveEvent(null)
+    }
+  }
 
   const copyInviteLink = () => {
     const link = `${window.location.origin}/group/${groupId}/join`
@@ -400,9 +461,49 @@ export default function GroupPage() {
 
             {sortedEvents.length > 0 && (
               <div className="flex flex-col gap-3 w-full max-w-xl">
-                {sortedEvents.map(({ id, data, ended }) => (
-                  <EventListCard key={id} id={id} data={data} ended={ended} />
-                ))}
+                {sortedEvents.map(({ id, data, ended, roles }) => {
+                  const isCreatorRole = roles?.has('creator')
+                  const isBusy = busyEventId === id
+
+                  return (
+                    <EventListCard
+                      key={id}
+                      id={id}
+                      data={data}
+                      ended={ended}
+                      badge={
+                        roles && roles.size > 0
+                          ? Array.from(roles)
+                              .map((role) =>
+                                role === 'creator'
+                                  ? '👑 Creator'
+                                  : '🙋 Participant',
+                              )
+                              .join(' · ')
+                          : null
+                      }
+                      cornerAction={
+                        isCreatorRole
+                          ? {
+                              icon: '🗑️',
+                              title: 'Delete event',
+                              disabled: isBusy,
+                              onClick: () =>
+                                setPendingDeleteEvent({ id, data }),
+                            }
+                          : roles?.has('participant')
+                            ? {
+                                icon: '✕',
+                                title: 'Remove yourself from this event',
+                                disabled: isBusy,
+                                onClick: () =>
+                                  setPendingLeaveEvent({ id, data }),
+                              }
+                            : null
+                      }
+                    />
+                  )
+                })}
               </div>
             )}
 
@@ -449,6 +550,24 @@ export default function GroupPage() {
         confirmLabel="Delete group"
         onConfirm={deleteGroup}
         onCancel={() => setPendingDeleteGroup(false)}
+      />
+
+      <ConfirmDialog
+        open={!!pendingDeleteEvent}
+        title="Delete this event?"
+        message={`"${pendingDeleteEvent?.data?.eventName}" and everyone's availability will be permanently deleted. This can't be undone.`}
+        confirmLabel="Delete event"
+        onConfirm={deleteEventCompletely}
+        onCancel={() => setPendingDeleteEvent(null)}
+      />
+
+      <ConfirmDialog
+        open={!!pendingLeaveEvent}
+        title="Remove yourself from this event?"
+        message={`Your availability for "${pendingLeaveEvent?.data?.eventName}" will be deleted. You can rejoin later from this group.`}
+        confirmLabel="Remove me"
+        onConfirm={leaveEvent}
+        onCancel={() => setPendingLeaveEvent(null)}
       />
     </div>
   )
