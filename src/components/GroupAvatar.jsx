@@ -1,4 +1,8 @@
-export default function GroupAvatar({ name, photoDataUrl, size = 'w-10 h-10' }) {
+export default function GroupAvatar({
+  name,
+  photoDataUrl,
+  size = 'w-15 h-15',
+}) {
   if (photoDataUrl) {
     return (
       <img
