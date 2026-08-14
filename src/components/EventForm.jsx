@@ -4,15 +4,16 @@ import { db } from '../firebase'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { toast } from 'react-hot-toast'
 import { useAuth } from '../context/useAuth'
+import { getLocalDateString } from '../utils/eventStatus'
 
 export default function EventForm({ mClicked, groupId = null, onCreated }) {
   const navigate = useNavigate()
   const { user } = useAuth()
 
-  const today = new Date().toISOString().split('T')[0]
-  let end = new Date(today)
-  end.setDate(end.getDate() + 7)
-  end = end.toISOString().split('T')[0]
+  const today = getLocalDateString()
+  const endDateObj = new Date()
+  endDateObj.setDate(endDateObj.getDate() + 7)
+  const end = getLocalDateString(endDateObj)
 
   const [formData, setFormData] = useState({
     eventName: '',

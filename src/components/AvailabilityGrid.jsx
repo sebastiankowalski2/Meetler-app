@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 import { useAuth } from '../context/useAuth'
 import LoginRequired from './LoginRequired'
+import { formatDisplayDate } from '../utils/eventStatus'
 
 export default function AvailabilityGrid({
   dateParticipantsMap,
@@ -159,7 +160,7 @@ export default function AvailabilityGrid({
     .slice(0, 5)
 
   const formatDate = (dateString) =>
-    parseDateString(dateString).toLocaleDateString('en-EN', {
+    formatDisplayDate(dateString, {
       weekday: 'short',
       month: 'short',
       day: 'numeric',

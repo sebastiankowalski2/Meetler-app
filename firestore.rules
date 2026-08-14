@@ -3,73 +3,203 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // =========================================================
+    // HELPERS
+    // =========================================================
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isEventOwner(eventId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/events/$(eventId))
+          .data.createdBy == request.auth.uid;
+    }
+
+    function isGroupOwner(groupId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/groups/$(groupId))
+          .data.ownerUid == request.auth.uid;
+    }
+
+
+    // =========================================================
+    // EVENTS
+    // =========================================================
+
     match /events/{eventId} {
-      // Anyone with the link can read an event (that's the whole point of
-      // the app - no login required to view/join). Split into get/list
-      // explicitly rather than relying on the "read" shorthand.
+
+      // Events are intentionally public.
+      // Anyone with the event link can view it.
       allow get, list: if true;
 
-      // Anyone can create an event (guest or logged-in). If createdBy is
-      // set, it must match the caller's own uid - no impersonating others.
-      allow create: if request.resource.data.createdBy == null
-        || request.resource.data.createdBy == request.auth.uid;
+      // Guests may create events.
+      // Signed-in users may create events only for themselves.
+      allow create: if
+        request.resource.data.createdBy == null
+        ||
+        (
+          signedIn()
+          && request.resource.data.createdBy == request.auth.uid
+        );
 
-      // Only the signed-in creator can edit/delete the event itself.
-      allow update, delete: if request.auth != null
+      // Only the original creator can modify/delete an event.
+      // Also prevent changing ownership during an update.
+      allow update: if
+        signedIn()
+        && resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdBy == resource.data.createdBy;
+
+      allow delete: if
+        signedIn()
         && resource.data.createdBy == request.auth.uid;
 
+
+      // -------------------------------------------------------
+      // EVENT PARTICIPANTS
+      // -------------------------------------------------------
+
       match /participants/{participantId} {
+
+        // Public because the event itself is public and the app
+        // displays participant availability on the event page.
         allow get, list: if true;
 
-        // Availability is a per-user action: it requires a signed-in
-        // Google account, the participant doc id must be the caller's own
-        // uid (no writing to someone else's slot), and the uid field
-        // inside the document must match too.
-        allow create, update: if request.auth != null
+        // A user can only create/update their own participant doc.
+        allow create, update: if
+          signedIn()
           && participantId == request.auth.uid
           && request.resource.data.uid == request.auth.uid;
 
-        allow delete: if request.auth != null
-          && (
-            // Leave the event yourself...
+        // A user can remove themselves.
+        // Event creator can also remove participants.
+        allow delete: if
+          signedIn()
+          &&
+          (
             participantId == request.auth.uid
-            // ...or, as the event's creator, remove a participant / cascade
-            // delete every participant doc when deleting the event itself.
-            || get(/databases/$(database)/documents/events/$(eventId)).data.createdBy == request.auth.uid
+            ||
+            isEventOwner(eventId)
           );
       }
     }
 
-    match /groups/{groupId} {
-      // Any signed-in user can look up a group by id (e.g. from a join
-      // link) to see its name/member count before deciding to join.
-      allow get: if request.auth != null;
 
-      allow create: if request.auth != null
+    // =========================================================
+    // COLLECTION-GROUP QUERY: PARTICIPANTS
+    // =========================================================
+    //
+    // Required by MyEventsPage:
+    //
+    // collectionGroup(db, 'participants')
+    //   .where('uid', '==', user.uid)
+    //
+    // Firebase requires a rule that matches the collection-group
+    // collection itself.
+    //
+
+    match /{path=**}/participants/{participantId} {
+
+      // IMPORTANT:
+      // The query is restricted to the authenticated user's UID.
+      // This prevents one logged-in user from querying another
+      // user's participant records through this collection group.
+      allow get, list: if
+        signedIn()
+        && resource.data.uid == request.auth.uid;
+    }
+
+
+    // =========================================================
+    // GROUPS
+    // =========================================================
+
+    match /groups/{groupId} {
+
+      // A signed-in user may open a group invite by ID.
+      allow get: if signedIn();
+
+      // Creating a group:
+      // ownerUid must always be the authenticated user's UID.
+      allow create: if
+        signedIn()
         && request.resource.data.ownerUid == request.auth.uid;
 
-      // Only the owner can rename or delete the group itself.
-      allow update, delete: if request.auth != null
+      // Only the current owner may modify/delete the group.
+      // ownerUid cannot be changed through update.
+      allow update: if
+        signedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid;
+
+      allow delete: if
+        signedIn()
         && resource.data.ownerUid == request.auth.uid;
 
+
+      // -------------------------------------------------------
+      // GROUP MEMBERS
+      // -------------------------------------------------------
+
       match /members/{memberId} {
-        allow get, list: if request.auth != null;
 
-        // Joining a group is a per-user action: you can only create your
-        // own membership doc.
-        allow create: if request.auth != null
+        // The current UI needs to read the member list:
+        // - GroupPage
+        // - JoinGroupPage
+        //
+        // This means authenticated users can see membership of a
+        // group if they know its ID.
+        allow get, list: if signedIn();
+
+        // A user can only create their own membership.
+        // Also require that the group actually exists.
+        allow create: if
+          signedIn()
           && memberId == request.auth.uid
-          && request.resource.data.uid == request.auth.uid;
-
-        allow delete: if request.auth != null
-          && (
-            // Leave the group yourself...
-            memberId == request.auth.uid
-            // ...or, as the group's owner, remove a member / cascade
-            // delete every membership when deleting the group itself.
-            || get(/databases/$(database)/documents/groups/$(groupId)).data.ownerUid == request.auth.uid
+          && request.resource.data.uid == request.auth.uid
+          && exists(
+            /databases/$(database)/documents/groups/$(groupId)
           );
+
+        // A user can leave.
+        // The owner can remove other members.
+        allow delete: if
+          signedIn()
+          &&
+          (
+            memberId == request.auth.uid
+            ||
+            isGroupOwner(groupId)
+          );
+
+        // There is currently no update operation in the UI.
+        // Keeping this denied is safer.
       }
+    }
+
+
+    // =========================================================
+    // COLLECTION-GROUP QUERY: MEMBERS
+    // =========================================================
+    //
+    // Required by MyEventsPage:
+    //
+    // collectionGroup(db, 'members')
+    //   .where('uid', '==', user.uid)
+    //
+
+    match /{path=**}/members/{memberId} {
+
+      // Only allow collection-group queries for the user's
+      // own membership documents.
+      allow get, list: if
+        signedIn()
+        && resource.data.uid == request.auth.uid;
     }
   }
 }

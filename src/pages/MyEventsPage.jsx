@@ -6,6 +6,7 @@ import {
   query,
   where,
   getDocs,
+  getCountFromServer,
   doc,
   getDoc,
   deleteDoc,
@@ -22,6 +23,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import CreateGroupDialog from '../components/CreateGroupDialog'
 import EventListCard from '../components/EventListCard'
 import GroupAvatar from '../components/GroupAvatar'
+import ScrollToTopButton from '../components/ScrollToTopButton'
 import { toast } from 'react-hot-toast'
 import { isEventEnded } from '../utils/eventStatus'
 
@@ -102,6 +104,23 @@ export default function MyEventsPage() {
                 data: eventSnap.data(),
                 roles: new Set(['participant']),
               })
+            }
+          }),
+        )
+
+        // Cheap aggregation query - counts docs without fetching them.
+        await Promise.all(
+          Array.from(results.values()).map(async (event) => {
+            try {
+              const countSnap = await getCountFromServer(
+                collection(db, 'events', event.id, 'participants'),
+              )
+              event.participantCount = countSnap.data().count
+            } catch (error) {
+              console.error(
+                `Failed to count participants for ${event.id}:`,
+                error,
+              )
             }
           }),
         )
@@ -337,7 +356,7 @@ export default function MyEventsPage() {
           !eventsLoading &&
           sortedEvents.length > 0 && (
             <div className="flex flex-col gap-3 w-full max-w-xl">
-              {sortedEvents.map(({ id, data, roles, ended }) => {
+              {sortedEvents.map(({ id, data, roles, ended, participantCount }) => {
                 const isCreatorRole = roles.has('creator')
                 const isBusy = busyEventId === id
 
@@ -347,6 +366,7 @@ export default function MyEventsPage() {
                     id={id}
                     data={data}
                     ended={ended}
+                    participantCount={participantCount}
                     badge={Array.from(roles)
                       .map((role) =>
                         role === 'creator' ? '👑 Creator' : '🙋 Participant',
@@ -451,6 +471,8 @@ export default function MyEventsPage() {
         onCreate={createGroup}
         onCancel={() => setShowCreateGroup(false)}
       />
+
+      <ScrollToTopButton />
     </div>
   )
 }

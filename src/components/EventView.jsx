@@ -17,7 +17,7 @@ import UserMenu from './UserMenu'
 import AppHeader from './AppHeader'
 import EditEventModal from './EditEventModal'
 import { useAuth } from '../context/useAuth'
-import { isEventEnded } from '../utils/eventStatus'
+import { isEventEnded, formatDisplayDate } from '../utils/eventStatus'
 import { googleCalendarLink } from '../utils/googleCalendar'
 
 export default function EventView({ eventData, eventId }) {
@@ -222,14 +222,11 @@ export default function EventView({ eventData, eventId }) {
           <span className="text-2xl">🏆</span>
           <p className="font-bold">
             Final date:{' '}
-            {(() => {
-              const [y, m, d] = confirmedDate.split('-').map(Number)
-              return new Date(y, m - 1, d).toLocaleDateString('en-EN', {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-              })
-            })()}
+            {formatDisplayDate(confirmedDate, {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+            })}
           </p>
           <a
             href={googleCalendarLink({

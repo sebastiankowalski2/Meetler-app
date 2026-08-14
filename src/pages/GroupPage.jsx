@@ -5,6 +5,7 @@ import {
   getDoc,
   collection,
   getDocs,
+  getCountFromServer,
   query,
   where,
   deleteDoc,
@@ -20,6 +21,7 @@ import Modal from '../components/Modal'
 import EventListCard from '../components/EventListCard'
 import EventForm from '../components/EventForm'
 import GroupAvatar from '../components/GroupAvatar'
+import ScrollToTopButton from '../components/ScrollToTopButton'
 import { toast } from 'react-hot-toast'
 import { isEventEnded } from '../utils/eventStatus'
 import { resizeImageToDataUrl } from '../utils/imageResize'
@@ -96,7 +98,17 @@ export default function GroupPage() {
               // Non-fatal: just skip the participant badge for this event.
             }
 
-            return { id: eventDoc.id, data, roles }
+            let participantCount
+            try {
+              const countSnap = await getCountFromServer(
+                collection(db, 'events', eventDoc.id, 'participants'),
+              )
+              participantCount = countSnap.data().count
+            } catch {
+              // Non-fatal: just skip the count badge for this event.
+            }
+
+            return { id: eventDoc.id, data, roles, participantCount }
           }),
         )
 
@@ -461,7 +473,7 @@ export default function GroupPage() {
 
             {sortedEvents.length > 0 && (
               <div className="flex flex-col gap-3 w-full max-w-xl">
-                {sortedEvents.map(({ id, data, ended, roles }) => {
+                {sortedEvents.map(({ id, data, ended, roles, participantCount }) => {
                   const isCreatorRole = roles?.has('creator')
                   const isBusy = busyEventId === id
 
@@ -471,6 +483,7 @@ export default function GroupPage() {
                       id={id}
                       data={data}
                       ended={ended}
+                      participantCount={participantCount}
                       badge={
                         roles && roles.size > 0
                           ? Array.from(roles)
@@ -569,6 +582,8 @@ export default function GroupPage() {
         onConfirm={leaveEvent}
         onCancel={() => setPendingLeaveEvent(null)}
       />
+
+      <ScrollToTopButton />
     </div>
   )
 }

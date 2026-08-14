@@ -3,6 +3,7 @@ import { doc, updateDoc } from 'firebase/firestore'
 import { db } from '../firebase'
 import { toast } from 'react-hot-toast'
 import Modal from './Modal'
+import { getLocalDateString } from '../utils/eventStatus'
 
 export default function EditEventModal({
   open,
@@ -11,7 +12,7 @@ export default function EditEventModal({
   eventData,
   datesLocked = false,
 }) {
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDateString()
 
   const [formData, setFormData] = useState({
     eventName: eventData.eventName || '',
