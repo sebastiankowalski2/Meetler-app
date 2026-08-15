@@ -1,6 +1,36 @@
 @import 'tailwindcss';
 
-/* Modern indigo + amber theme */
+/* ==========================================================================
+   THEME VARIABLES — edit here to customize colors.
+   ==========================================================================
+   Each theme only overrides FIVE things:
+     --color-primary        (buttons, links, headings, borders)
+     --color-primary-hover  (hover state for primary buttons)
+     --color-primary-rgb    (same as --color-primary, as "R, G, B" - used
+                             wherever a color needs an alpha channel)
+     --color-secondary      (accents: badges, small highlights)
+     --color-secondary-rgb  (same as --color-secondary, as "R, G, B")
+   ...plus the `body { background: ... }` gradient below each block.
+
+   Body TEXT color is deliberately NOT themed - it stays a fixed dark
+   neutral (#0f172a) in every theme, because virtually all text in this
+   app sits on light glass/white cards floating over the background, not
+   directly on the gradient. Changing it per theme is what made things
+   hard to read last time - don't reintroduce that.
+
+   The gold "final date confirmed" styling (CalendarButton, EventView,
+   EventListCard) intentionally uses Tailwind's built-in `amber-*` classes
+   directly, not a theme variable - that's a fixed "this is the winning
+   date" signal and should look the same in every theme.
+
+   To add a new theme:
+     1. Copy one of the `html[data-theme='...']` blocks below.
+     2. Give it a new theme id (e.g. 'plum') and pick your 5 colors + a
+        background gradient.
+     3. Add that same id to THEMES in src/context/themes.js so it shows
+        up as a swatch in the account menu.
+   ========================================================================== */
+
 @theme {
   --color-primary: #4f46e5;
   --color-primary-rgb: 79, 70, 229;
@@ -30,5 +60,78 @@
   h2,
   h3 {
     font-family: var(--font-display);
+  }
+
+  /* --- Ocean theme: teal/blue -------------------------------------- */
+  html[data-theme='ocean'] {
+    --color-primary: #22345c; /*#35519 */
+    --color-primary-rgb: 8, 145, 178;
+    --color-primary-hover: #0e7490;
+
+    --color-secondary: #76d6ff;
+    --color-secondary-rgb: 56, 189, 248;
+  }
+
+  html[data-theme='ocean'] body {
+    background: linear-gradient(135deg, #0bceff 0%, #4fffb9 100%);
+
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* --- Forest theme: green -------------------------------------------- */
+  html[data-theme='pinkie'] {
+    --color-primary: #542c8d;
+    --color-primary-rgb: 5, 150, 105;
+    --color-primary-hover: #7d45ca;
+
+    --color-secondary: #f89efb;
+    --color-secondary-rgb: 163, 230, 53;
+  }
+
+  html[data-theme='pinkie'] body {
+    background: linear-gradient(135deg, #ff6e25 0%, #f4f73f 100%);
+
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* --- Paper theme: minimal / neutral -------------------------------- */
+  html[data-theme='paper'] {
+    --color-primary: #3f3f46;
+    --color-primary-rgb: 63, 63, 70;
+    --color-primary-hover: #27272a;
+
+    --color-secondary: #e4e4e7;
+    --color-secondary-rgb: 228, 228, 231;
+
+    --font-display: 'Sora', 'Inter', sans-serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html[data-theme='paper'] body {
+    background: #d4d4d4;
+    color: #292524;
+
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* --- Paper Dark theme: warm charcoal + amber ---------------------- */
+  html[data-theme='paper-dark'] {
+    --color-primary: rgb(0, 226, 52);
+    --color-primary-rgb: 0, 226, 52;
+    --color-primary-hover: #02b52b;
+
+    --color-secondary: #d0d0d1;
+    --color-secondary-rgb: 228, 228, 231;
+
+    --font-display: 'Sora', 'Inter', sans-serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html[data-theme='paper-dark'] body {
+    background: #1c1917;
+    color: white;
   }
 }

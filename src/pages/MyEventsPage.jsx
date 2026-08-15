@@ -356,40 +356,42 @@ export default function MyEventsPage() {
           !eventsLoading &&
           sortedEvents.length > 0 && (
             <div className="flex flex-col gap-3 w-full max-w-xl">
-              {sortedEvents.map(({ id, data, roles, ended, participantCount }) => {
-                const isCreatorRole = roles.has('creator')
-                const isBusy = busyEventId === id
+              {sortedEvents.map(
+                ({ id, data, roles, ended, participantCount }) => {
+                  const isCreatorRole = roles.has('creator')
+                  const isBusy = busyEventId === id
 
-                return (
-                  <EventListCard
-                    key={id}
-                    id={id}
-                    data={data}
-                    ended={ended}
-                    participantCount={participantCount}
-                    badge={Array.from(roles)
-                      .map((role) =>
-                        role === 'creator' ? '👑 Creator' : '🙋 Participant',
-                      )
-                      .join(' · ')}
-                    cornerAction={
-                      isCreatorRole
-                        ? {
-                            icon: '🗑️',
-                            title: 'Delete event',
-                            disabled: isBusy,
-                            onClick: () => setPendingDelete({ id, data }),
-                          }
-                        : {
-                            icon: '✕',
-                            title: 'Remove from My Events',
-                            disabled: isBusy,
-                            onClick: () => setPendingLeave({ id, data }),
-                          }
-                    }
-                  />
-                )
-              })}
+                  return (
+                    <EventListCard
+                      key={id}
+                      id={id}
+                      data={data}
+                      ended={ended}
+                      participantCount={participantCount}
+                      badge={Array.from(roles)
+                        .map((role) =>
+                          role === 'creator' ? '👑 Creator' : '🙋 Participant',
+                        )
+                        .join(' · ')}
+                      cornerAction={
+                        isCreatorRole
+                          ? {
+                              icon: '🗑️',
+                              title: 'Delete event',
+                              disabled: isBusy,
+                              onClick: () => setPendingDelete({ id, data }),
+                            }
+                          : {
+                              icon: '✕',
+                              title: 'Remove from My Events',
+                              disabled: isBusy,
+                              onClick: () => setPendingLeave({ id, data }),
+                            }
+                      }
+                    />
+                  )
+                },
+              )}
             </div>
           )}
 
@@ -422,7 +424,7 @@ export default function MyEventsPage() {
                     backdropFilter: 'blur(10px)',
                     backgroundColor: 'rgba(255, 255, 255, 0.35)',
                   }}
-                  className="flex items-center gap-3 p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200"
+                  className="flex items-center gap-3 p-4 rounded-xl shadow-md hover:opacity-90 hover:shadow-lg transition-shadow duration-200"
                 >
                   <GroupAvatar
                     name={data.name}

@@ -21,10 +21,10 @@ import Modal from '../components/Modal'
 import EventListCard from '../components/EventListCard'
 import EventForm from '../components/EventForm'
 import GroupAvatar from '../components/GroupAvatar'
+import ImageCropModal from '../components/ImageCropModal'
 import ScrollToTopButton from '../components/ScrollToTopButton'
 import { toast } from 'react-hot-toast'
 import { isEventEnded } from '../utils/eventStatus'
-import { resizeImageToDataUrl } from '../utils/imageResize'
 
 export default function GroupPage() {
   const { groupId } = useParams()
@@ -250,14 +250,23 @@ export default function GroupPage() {
     }
   }
 
-  const handlePhotoChange = async (e) => {
+  const [cropSrc, setCropSrc] = useState(null)
+
+  const handlePhotoChange = (e) => {
     const file = e.target.files?.[0]
     e.target.value = '' // allow re-selecting the same file later
     if (!file || !isOwner) return
 
+    const reader = new FileReader()
+    reader.onload = () => setCropSrc(reader.result)
+    reader.onerror = () => toast.error('Could not read that image.')
+    reader.readAsDataURL(file)
+  }
+
+  const savePhoto = async (photoDataUrl) => {
     setUploadingPhoto(true)
+    setCropSrc(null)
     try {
-      const photoDataUrl = await resizeImageToDataUrl(file)
       await updateDoc(doc(db, 'groups', groupId), { photoDataUrl })
       setGroup((prev) => ({ ...prev, photoDataUrl }))
       toast.success('Group photo updated!')
@@ -581,6 +590,13 @@ export default function GroupPage() {
         confirmLabel="Remove me"
         onConfirm={leaveEvent}
         onCancel={() => setPendingLeaveEvent(null)}
+      />
+
+      <ImageCropModal
+        open={!!cropSrc}
+        imageSrc={cropSrc}
+        onCancel={() => setCropSrc(null)}
+        onCropped={savePhoto}
       />
 
       <ScrollToTopButton />

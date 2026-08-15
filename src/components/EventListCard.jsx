@@ -17,7 +17,7 @@ export default function EventListCard({
           ? 'rgba(255, 255, 255, 0.18)'
           : 'rgba(255, 255, 255, 0.35)',
       }}
-      className={`relative rounded-xl px-0 shadow-md transition-shadow duration-200 ${ended ? 'opacity-60 hover:opacity-80' : 'hover:shadow-lg'}`}
+      className={`relative rounded-xl px-0 shadow-md transition-shadow duration-200 hover:opacity-90 ${ended ? 'opacity-60 hover:opacity-80' : 'hover:shadow-lg'}`}
     >
       <Link
         to={`/event/${id}`}

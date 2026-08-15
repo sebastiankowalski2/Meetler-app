@@ -60,7 +60,7 @@ export default function EditEventModal({
 
   return (
     <Modal open={open} title="Edit event" onClose={onClose}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="text-black flex flex-col gap-3">
         <div>
           <label className="font-bold text-sm" htmlFor="editEventName">
             Event Name

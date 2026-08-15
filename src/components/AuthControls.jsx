@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
+import { useTheme } from '../context/useTheme'
+import { THEMES } from '../context/themes'
 
 // Small, reusable block of UI for Google sign-in / sign-out + a link to
 // "My events". Doesn't render its own positioning wrapper so it can be
@@ -22,6 +23,7 @@ export default function AuthControls({
   } = useAuth()
   const [editingName, setEditingName] = useState(false)
   const [nameDraft, setNameDraft] = useState('')
+  const { theme, setTheme } = useTheme()
 
   if (authLoading) {
     return <p className="text-xs opacity-70">Loading account…</p>
@@ -53,7 +55,7 @@ export default function AuthControls({
 
   return (
     <div
-      className={`flex w-full ${compact ? 'flex-row items-center gap-2' : 'flex-col items-start gap-3'}`}
+      className={`text-black flex w-full ${compact ? 'flex-row items-center gap-2' : 'flex-col items-start gap-3'}`}
     >
       <div className="rounded-2xl p-2 w-full bg-secondary flex items-center gap-2">
         {user.photoURL && (
@@ -102,12 +104,23 @@ export default function AuthControls({
           </button>
         ))}
 
-      <Link
-        to="/my-events"
-        className="text-sm font-bold p-1 text-primary hover:underline"
-      >
-        📅 My Events
-      </Link>
+      {showEditName && (
+        <div className="w-full">
+          <p className="text-xs font-bold opacity-60 mb-2">Theme</p>
+          <div className="flex justify-center items-center gap-2">
+            {THEMES.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => setTheme(option.id)}
+                title={option.label}
+                className={`w-6 h-6 rounded-full cursor-pointer transition-transform duration-150 ${theme === option.id ? 'scale-110 ring-2 ring-offset-1 ring-primary' : 'hover:scale-105'}`}
+                style={{ backgroundColor: option.swatch }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       <button
         onClick={signOutUser}
         className="text-sm font-bold w-full text-red-600 p-2 transition-colors bg-red-100 hover:bg-red-300 rounded-2xl cursor-pointer"

@@ -240,7 +240,7 @@ export default function AvailabilityGrid({
       ) : locked ? (
         <button
           onClick={unlockForEditing}
-          className="z-50 text-md sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-white text-primary border-2 border-primary px-4 py-2 rounded-lg hover:bg-primary/10 transition-colors duration-250 cursor-pointer"
+          className="z-29 text-md sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-white text-primary border-2 border-primary px-4 py-2 rounded-lg hover:bg-primary/10 transition-colors duration-250 cursor-pointer"
         >
           ✏️ Change availability
         </button>
@@ -248,7 +248,7 @@ export default function AvailabilityGrid({
         <button
           disabled={!firstClick}
           onClick={saveAvailability}
-          className={`z-50 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-primary text-white px-4 py-2 rounded-lg hover:primary-hover transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
+          className={`z-29 text-xl sm:text-xl md:text-xl lg:text-2xl sticky mb-4 top-5 bg-primary text-white px-4 py-2 rounded-lg hover:primary-hover transition-colors duration-250 ${firstClick ? 'animate-pulse cursor-pointer' : 'cursor-not-allowed opacity-70'}`}
         >
           Save Availability
         </button>

@@ -36,7 +36,7 @@ export default function HowItWorks({ EventView, EventPage }) {
           backdropFilter: 'blur(12px)',
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
         }}
-        className={`absolute right-0 top-full mt-2 w-72 p-4 rounded-2xl shadow-xl border border-black/5 origin-top-right transition-all duration-200 z-40 ${isOpen ? 'opacity-100 scale-100 translate-y-0 translate-x-24 sm:translate-x-0' : 'opacity-0 scale-90 sm:translate-x-0 translate-x-14 -translate-y-1 pointer-events-none'}`}
+        className={`text-black absolute right-0 top-full mt-2 w-72 p-4 rounded-2xl shadow-xl border border-black/5 origin-top-right transition-all duration-200 z-40 ${isOpen ? 'opacity-100 scale-100 translate-y-0 translate-x-24 sm:translate-x-0' : 'opacity-0 scale-90 sm:translate-x-0 translate-x-14 -translate-y-1 pointer-events-none'}`}
       >
         <h3 className="text-lg font-extrabold mb-2 text-primary">
           📌 How it works
