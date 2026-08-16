@@ -202,22 +202,34 @@ export default function EventView({ eventData, eventId }) {
 
   return (
     <div>
-      <AppHeader
-        right={
-          <>
-            <HowItWorks EventView={true} />
-            <ParticipantsDropdown
-              participants={participants}
-              eventId={eventId}
-              isCreator={isCreator}
-              onSelfRemoved={handleSelfRemoved}
-            />
-            <UserMenu avatarOnly isCreator={isCreator} />
-          </>
-        }
-      />
+      <AppHeader right={<UserMenu avatarOnly isCreator={isCreator} />} />
+      <div className="flex items-center justify-between px-4 sm:px-0 mt-3">
+        <HowItWorks EventView={true} />
+        <ParticipantsDropdown
+          participants={participants}
+          eventId={eventId}
+          isCreator={isCreator}
+          eventCreatorId={eventData?.createdBy}
+          onSelfRemoved={handleSelfRemoved}
+        />
+      </div>
 
-      {confirmedDate ? (
+      {eventEnded && (
+        <div className="mx-4 sm:mx-0 mt-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 px-5 py-4 flex flex-col sm:flex-row items-center gap-3 justify-center text-center sm:text-left">
+          <span className="text-2xl">⏳</span>
+          <p className="font-bold">
+            This event has ended. Want to plan the next one?
+          </p>
+          <Link
+            to="/"
+            className="rounded-xl bg-primary text-white text-sm font-bold px-4 py-2 hover:bg-primary-hover transition-colors duration-150"
+          >
+            Create a new event
+          </Link>
+        </div>
+      )}
+
+      {confirmedDate && (
         <div className="mx-4 sm:mx-0 mt-6 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 px-5 py-4 flex flex-col sm:flex-row items-center gap-3 justify-center text-center sm:text-left">
           <span className="text-2xl">🏆</span>
           <p className="font-bold">
@@ -228,18 +240,20 @@ export default function EventView({ eventData, eventId }) {
               day: 'numeric',
             })}
           </p>
-          <a
-            href={googleCalendarLink({
-              eventName: eventData.eventName,
-              eventLocation: eventData.eventLocation,
-              confirmedDate,
-            })}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-xl bg-primary text-white text-sm font-bold px-4 py-2 hover:bg-primary-hover transition-colors duration-150"
-          >
-            📅 Add to Google Calendar
-          </a>
+          {!eventEnded && (
+            <a
+              href={googleCalendarLink({
+                eventName: eventData.eventName,
+                eventLocation: eventData.eventLocation,
+                confirmedDate,
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-xl bg-primary text-white text-sm font-bold px-4 py-2 hover:bg-primary-hover transition-colors duration-150"
+            >
+              📅 Add to Google Calendar
+            </a>
+          )}
           {isCreator && (
             <button
               onClick={unconfirmDate}
@@ -249,21 +263,6 @@ export default function EventView({ eventData, eventId }) {
             </button>
           )}
         </div>
-      ) : (
-        eventEnded && (
-          <div className="mx-4 sm:mx-0 mt-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 px-5 py-4 flex flex-col sm:flex-row items-center gap-3 justify-center text-center sm:text-left">
-            <span className="text-2xl">⏳</span>
-            <p className="font-bold">
-              This event has ended. Want to plan the next one?
-            </p>
-            <Link
-              to="/"
-              className="rounded-xl bg-primary text-white text-sm font-bold px-4 py-2 hover:bg-primary-hover transition-colors duration-150"
-            >
-              Create a new event
-            </Link>
-          </div>
-        )
       )}
 
       <div
@@ -275,28 +274,31 @@ export default function EventView({ eventData, eventId }) {
         }}
         className="mx-6 sm:mx-0 rounded-bl-4xl rounded-tr-4xl flex flex-col sm:flex-row items-center align-middle justify-center mt-10 mb-20 lg:gap-25 shadow-lg shadow-white/50 p-4 sm:p-10 lg:p-16"
       >
-        <div className="justify-center align-middle items-center mb-5 sm:mb-0">
-          <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-primary font-bold">
-            Share this link with your friends:<br></br>
-          </h2>
+        {' '}
+        {!eventEnded && (
+          <div className="justify-center align-middle items-center mb-5 sm:mb-0">
+            <h2 className="text-xl sm:text-2xl md:text-2xl lg:text-2xl mb-2 mt-2 pr-2 pl-2 text-primary font-bold">
+              Share this link with your friends:<br></br>
+            </h2>
 
-          <button
-            className="text-sm text-white rounded-2xl px-4 py-2 bg-primary hover:bg-primary-hover transition-all duration-250 cursor-pointer"
-            onClick={() => {
-              navigator.clipboard.writeText(window.location.href)
-              toast.success('Link copied to clipboard!', {
-                style: {
-                  fontStyle: 'extra-bold',
-                },
-                iconTheme: {
-                  primary: 'var(--color-primary)',
-                },
-              })
-            }}
-          >
-            Copy Link
-          </button>
-        </div>
+            <button
+              className="text-sm text-white rounded-2xl px-4 py-2 bg-primary hover:bg-primary-hover transition-all duration-250 cursor-pointer"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href)
+                toast.success('Link copied to clipboard!', {
+                  style: {
+                    fontStyle: 'extra-bold',
+                  },
+                  iconTheme: {
+                    primary: 'var(--color-primary)',
+                  },
+                })
+              }}
+            >
+              Copy Link
+            </button>
+          </div>
+        )}
         <div className="px-5 max-w-88 sm:max-w-200 items-center rounded-2xl flex flex-col gap-4">
           <div className="relative mt-5 flex w-full items-center justify-center gap-2">
             <div className="relative flex items-center justify-center">
@@ -331,22 +333,24 @@ export default function EventView({ eventData, eventId }) {
         </div>
       </div>
 
-      <AvailabilityGrid
-        dateParticipantsMap={dateParticipantsMap}
-        scoreMap={scoreMap}
-        participantsCount={participants.length}
-        isGuest={isGuest}
-        eventEnded={eventEnded}
-        authLoading={authLoading}
-        eventData={eventData}
-        eventId={eventId}
-        selectedDates={selectedDates}
-        setSelectedDates={setSelectedDates}
-        isCreator={isCreator}
-        confirmedDate={confirmedDate}
-        onConfirmDate={confirmDate}
-        hadSavedAvailability={hadSavedAvailability}
-      />
+      {!eventEnded && (
+        <AvailabilityGrid
+          dateParticipantsMap={dateParticipantsMap}
+          scoreMap={scoreMap}
+          participantsCount={participants.length}
+          isGuest={isGuest}
+          eventEnded={eventEnded}
+          authLoading={authLoading}
+          eventData={eventData}
+          eventId={eventId}
+          selectedDates={selectedDates}
+          setSelectedDates={setSelectedDates}
+          isCreator={isCreator}
+          confirmedDate={confirmedDate}
+          onConfirmDate={confirmDate}
+          hadSavedAvailability={hadSavedAvailability}
+        />
+      )}
 
       {showEditEvent && (
         <EditEventModal

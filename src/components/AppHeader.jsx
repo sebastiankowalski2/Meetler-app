@@ -31,7 +31,7 @@ export default function AppHeader({ onLogoClick, spin = false, right }) {
             to="/my-events"
             title="My Events"
             //className="flex items-center gap-0.5 text-sm font-bold text-primary hover:underline shrink-0"
-            className="rounded-full px-3 py-2 text-sm font-bold transition-colors duration-150 cursor-pointer bg-primary text-white hover:bg-primary-hover active:bg-primary/80"
+            className="rounded-full sm:px-3 px-1 py-2 text-xs sm:text-sm font-bold transition-colors duration-150 cursor-pointer bg-primary text-white hover:bg-primary-hover active:bg-primary/80"
           >
             📅 <span className="sm:inline">My Events</span>
           </Link>

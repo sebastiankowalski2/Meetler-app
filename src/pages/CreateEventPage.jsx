@@ -17,17 +17,15 @@ export default function CreateEventPage() {
       <AppHeader
         onLogoClick={handleMClick}
         spin={mClicked}
-        right={
-          <>
-            <HowItWorks EventPage={true} />
-            <UserMenu avatarOnly />
-          </>
-        }
+        right={<UserMenu avatarOnly />}
       />
 
-      <h1 className="text-primary font-display text-2xl sm:text-3xl font-extrabold text-center px-4 mt-4">
-        Find a time that works for everyone.
-      </h1>
+      <div className="flex items-center justify-center gap-2 px-4 mt-4">
+        <h1 className="text-primary font-display text-2xl sm:text-3xl font-extrabold text-center">
+          Find a time that works for everyone.
+        </h1>
+        <HowItWorks EventPage={true} />
+      </div>
 
       <div
         style={{

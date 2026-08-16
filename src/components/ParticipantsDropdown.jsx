@@ -9,6 +9,7 @@ export default function ParticipantsDropdown({
   participants,
   eventId,
   isCreator = false,
+  eventCreatorId,
   onSelfRemoved,
 }) {
   const { user } = useAuth()
@@ -80,6 +81,7 @@ export default function ParticipantsDropdown({
               className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm font-bold text-slate-800 hover:bg-slate-100"
             >
               <span className="truncate">
+                {participant.uid === eventCreatorId && '👑 '}
                 {participant.displayName || 'Anonymous'}
               </span>
               {(isCreator || participant.uid === user?.uid) && (
