@@ -322,7 +322,7 @@ export default function EventView({ eventData, eventId }) {
               <span className="text-md md:text-xl lg:text-2xl pb-2 pr-1">
                 🏠
               </span>
-              <h2 className="text-md md:text-xl lg:text-xl mb-4 mt-2 pr-2 pl-2 text-secondary bg-primary inset-shadow-sm shadow-sm font-bold">
+              <h2 className="text-md md:text-xl lg:text-xl mb-4 mt-2 pr-2 pl-2 text-white bg-primary inset-shadow-sm shadow-sm font-bold">
                 {eventData.eventLocation.toUpperCase()}
               </h2>
               <span className="text-md md:text-xl lg:text-2xl pb-2 pl-1">

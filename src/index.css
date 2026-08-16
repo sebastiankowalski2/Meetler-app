@@ -80,16 +80,16 @@
   }
 
   /* --- Forest theme: green -------------------------------------------- */
-  html[data-theme='pinkie'] {
+  html[data-theme='orangie'] {
     --color-primary: #542c8d;
     --color-primary-rgb: 5, 150, 105;
     --color-primary-hover: #7d45ca;
 
-    --color-secondary: #f89efb;
+    --color-secondary: #f8864d;
     --color-secondary-rgb: 163, 230, 53;
   }
 
-  html[data-theme='pinkie'] body {
+  html[data-theme='orangie'] body {
     background: linear-gradient(135deg, #ff6e25 0%, #f4f73f 100%);
 
     background-repeat: no-repeat;

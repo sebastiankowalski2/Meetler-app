@@ -114,7 +114,7 @@ export default function AuthControls({
                 onClick={() => setTheme(option.id)}
                 title={option.label}
                 className={`w-6 h-6 rounded-full cursor-pointer transition-transform duration-150 ${theme === option.id ? 'scale-110 ring-2 ring-offset-1 ring-primary' : 'hover:scale-105'}`}
-                style={{ backgroundColor: option.swatch }}
+                style={{ background: option.swatch }}
               />
             ))}
           </div>
